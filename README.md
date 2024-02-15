@@ -134,9 +134,10 @@ class ViveStream:
 		# stream: The current stream instance being processed. 
 		# streams: A list of all stream instances being processed (including self!). You can use this list to access other streams if needed. 
 		
+		# access property values defined at __init__()
 		settings = stream['settings']
 		
-		# dummy data, but assume this would query pos from a Vive tracker
+		# dummy data, but assume this would query a position from a Vive tracker
 		data = {
 			'X': 1.5,
 			'Y': 2.3,
@@ -144,11 +145,26 @@ class ViveStream:
 			'text':  settings['extra_text'],
 		}
 
+		# logic
 		if settings['enable_mult']:
 			data['X'] *= settings['mult_value']
 			data['Y'] *= settings['mult_value']
 			data['Z'] *= settings['mult_value']
 
+		# optionally access video input properties:
+		# video.imageRGB
+		# video.resolution
+		# video.frame
+		# video.source_file
+		# etc...
+
+		# you can also annotate the current image being displayed in the UI by overriding "video.imageDISPLAY" with a numpy array
+		# (make sure to keep array shape the same as the original image)
+
+		# here we are simply bypassing the display image:
+		# video.imageDISPLAY = video.imageRGB
+
+		# finally, return the dict data to be sent through UDP connection
 		return data
 ```
 
