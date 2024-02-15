@@ -2,10 +2,11 @@
 ![VML Streamer Splash](assets/images/vml_streamer_splash.png)
 -->
 
-# VML_Streamer
+# VML_Streamer (Qt)
 Vision and Machine Learning data streamer for 
 [SideFX Houdini](https://www.sidefx.com/). (Intended use video [here](https://www.youtube.com/watch?v=AqozqMFU_kg))
 
+![Qt logo](assets/images/qt_logo.png) Version
 ---
 
 ## How it works:
@@ -215,4 +216,8 @@ this will ensure pyinstaller includes all necessary .py files during the build.
 - Video playback can be slow and not match file's source FPS. This in being fixed at the moment! For now use the video speed to get faster playback.
 - "ffmpeg" needs to be installed (and available on path!) for OBS virtual camera to work on Windows! 
 VML Streamer is based on Qt for its user interface. Qt uses the QMediaDevices class to acquire available webcams, but recently Qt6 removed support for Direct Show device listing on windows. Since OBS Virtual camera uses Direct Show, the alternative way of detecting the device is through ffmpeg.
+
+- Error "*Corrupt JPEG data: 1 extraneous bytes before marker 0xd3*" printed to stdout:
+This can happen on Linux machines reading logitech webcams. 
+(This is a problem related to libjpeg, as stated [here](https://github.com/opencv/opencv/issues/9477#issuecomment-390679150), and should not compromise the program functionality)
 
