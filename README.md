@@ -210,7 +210,7 @@ this will ensure pyinstaller includes all necessary .py files during the build.
 
 ---
 
-# Known limitations
+# VML Streamer Known limitations
 
 - Video playback can be slow and not match file's source FPS. This in being fixed at the moment! For now use the video speed to get faster playback.
 - "ffmpeg" needs to be installed (and available on path!) for OBS virtual camera to work on Windows! 
