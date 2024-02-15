@@ -118,15 +118,15 @@ class ViveStream:
 
 ## Step 3 - define a "run()" method
 
-Open "main.py", import your newly created file:
-
 This is the main method where you return data to be sent through sockets. 
 Return types available:
- - dict: sent as a dumped json string
- - numpy array: sent as a video frame (flattened list of uint8: 0-255 rgb values)
+ - *dict*: sent as a dumped json string
+ - *numpy array*: sent as a video frame (flattened list of uint8: 0-255 rgb values)
 
 ```python
-...
+class ViveStream:
+	def __init__(self):
+		...
 
 	def run(self, video, stream, streams):
 
