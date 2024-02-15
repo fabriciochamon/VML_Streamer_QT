@@ -130,7 +130,7 @@ class ViveStream:
 
 	def run(self, video, stream, streams):
 
-		# video:  The video object containing information about the current frame being displayed in the UI
+		# video: The video object with information about current frame being displayed in the UI
 		# stream: The current stream instance being processed. 
 		# streams: A list of all stream instances being processed (including self!). You can use this list to access other streams if needed. 
 		
@@ -158,7 +158,8 @@ class ViveStream:
 		# video.source_file
 		# etc...
 
-		# you can also annotate the current image being displayed in the UI by overriding "video.imageDISPLAY" with a numpy array
+		# you can also annotate the current image being displayed in the UI by 
+		# overriding "video.imageDISPLAY" with a numpy array
 		# (make sure to keep array shape the same as the original image)
 
 		# here we are simply bypassing the display image:
