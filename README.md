@@ -171,7 +171,7 @@ class ViveStream:
 
 That's it! now you should see a new stream type in the UI.
 
-Check vml-streamer/_st_stream_template.py for a complete documented example!
+Check *vml-streamer/_st_stream_template.py* for a complete documented example!
 
 ---
 
@@ -189,6 +189,8 @@ To build the executable just activate your venv in a terminal, then run:
 
 	cd vml-streamer
 	pyinstaller main.spec
+
+File will be saved inside *vml-streamer/dist* folder
 
 ## Troubleshooting
 
