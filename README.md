@@ -170,12 +170,44 @@ class ViveStream:
 
 That's it! now you should see a new stream type in the UI.
 
-## Step 4 (optional) - If you plan to build a binary with PyInstaller
+Check vml-streamer/_st_stream_template.py for a complete documented example!
 
-After finishi adding all your custom stream types, make sure to run:
+---
+
+
+# Building a binary file with PyInstaller
+
+## Files and folders
+- vml-streamer/main.spec file is already provided to facilitate the build process.
+- The .spec file is setup to generate a single executable (i.e.: "one-file" option)
+- If you add custom stream types, use the "models" subfolder to store extra required bin files. They all get included in the final executable.
+- Because one-file is used, all depdendencies get extracted to a temp folder at runtime. You will NOT be able to use relative paths to, for example, load a binary file from "models". Instead, please "import resources" and get the absolute path by using "resources.getPath('./models/my-resource.ext')"
+
+## Building
+To build the executable just activate your venv in a terminal, then run:
+
+	cd vml-streamer
+	pyinstaller main.spec
+
+## Troubleshooting
+
+- Windows and pywintypes:
+If you're having errors related to pywintypes, try disabling your anti-virus! Windows can flag "pywintypes" as virus for some reason.
+
+- Custom stream types and "python module not found" errors:
+Before building, make sure to run:
 
  vml-streamer/rebuild_stream_types.bat (if on Windows)
  vml-streamer/rebuild_stream_types.sh  (if on Linux)
 
 Because of the dynamic nature of how the stream types are read by the main app, 
 this will ensure pyinstaller includes all necessary .py files during the build.
+
+---
+
+# Known limitations
+
+- Video playback can be slow and not match file's source FPS. This in being fixed at the moment! For now use the video speed to get faster playback.
+- "ffmpeg" needs to be installed (and available on path!) for OBS virtual camera to work on Windows! 
+VML Streamer is based on Qt for its user interface. Qt uses the QMediaDevices class to acquire available webcams, but recently Qt6 removed support for Direct Show device listing on windows. Since OBS Virtual camera uses Direct Show, the alternative way of detecting the device is through ffmpeg.
+
