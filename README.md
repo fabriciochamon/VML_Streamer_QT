@@ -194,15 +194,15 @@ File will be saved inside *vml-streamer/dist* folder
 
 ## Troubleshooting
 
-- Windows and pywintypes:
+* Windows and pywintypes:
 If you're having errors related to pywintypes, try disabling your anti-virus! Windows can flag "pywintypes" as virus for some reason.
 
-- Custom stream types and "python module not found" errors:
+* Custom stream types and "python module not found" errors:
 
 Before building, make sure to run:
 
- -- vml-streamer/rebuild_stream_types.bat (if on Windows)
- -- vml-streamer/rebuild_stream_types.sh  (if on Linux)
+** vml-streamer/rebuild_stream_types.bat (if on Windows)
+** vml-streamer/rebuild_stream_types.sh  (if on Linux)
 
 Because of the dynamic nature of how the stream types are read by the main app, 
 this will ensure pyinstaller includes all necessary .py files during the build.
