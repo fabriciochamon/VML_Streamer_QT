@@ -73,7 +73,7 @@ class ViveStream:
 		...
 ```
 
-## Step 2 - Add your new stream type properties
+## Step 2 - add main properties
 
 ```python
 class ViveStream:
