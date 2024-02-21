@@ -388,7 +388,8 @@ class MainWindow(QtWidgets.QWidget):
 				if state: 
 					if isSettings:
 						if self.current_video_source!='None':
-							widget.show()
+							if name == 'webcam_settings_grp' and self.current_video_source == 'Webcam': widget.show()
+							if name == 'videosettings_grp' and self.current_video_source == 'Video file': widget.show()
 					else:
 						widget.show()
 				else: 

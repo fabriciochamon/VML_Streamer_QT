@@ -1,0 +1,6 @@
+{
+	"env": [
+		{"VISION_ML": "/path/to/Vision_ML"},
+		{"HOUDINI_PATH": "$VISION_ML"}
+	]
+}
