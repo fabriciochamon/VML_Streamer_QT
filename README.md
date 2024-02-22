@@ -230,7 +230,10 @@ The v4l2 camera exposure setting has a big impact on fps. Often times you might 
 to turn off "auto exposure" and lower the manual exposure setting. To compensate for the darker image, 
 increase gain/brightness and you should now have a much faster camera read speed.
 
+Doing this I've been observing gains from 15 fps -> 30 fps (or more, depending on the webcam hardware!).
+
 ![Linux camera controls](assets/images/camera_controls.png)
+
 *(A=auto exposure, E=exposure, G=gain, B=brightness, C=contrast)*
 
-Doing this I've been observing gains from 15 fps -> 30 fps (or more, depending on the webcam hardware!).
+
