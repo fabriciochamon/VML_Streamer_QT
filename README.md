@@ -31,7 +31,7 @@ So consider recreating your virtual environment by hand:
 *(Tested on Python 3.10.\*)*
 
 	# navigate to main dir
-	cd VML_Streamer
+	cd VML_Streamer_QT
 
 	# create venv
 	python -m venv venv
