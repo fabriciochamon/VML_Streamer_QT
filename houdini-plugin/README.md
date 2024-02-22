@@ -9,4 +9,4 @@ Vision ML contains a set of decoder nodes for VML Streamer, plus a few utility n
 3. Copy the json file to `<houdini user dir>/packages`
 4. Restart Houdini
 
-All node will appear under the "Vision ML" tab menu category.
+All nodes will appear under the "Vision ML" tab menu category.
