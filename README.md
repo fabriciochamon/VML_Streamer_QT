@@ -231,6 +231,6 @@ to turn off "auto exposure" and lower the manual exposure setting. To compensate
 increase gain/brightness and you should now have a much faster camera read speed.
 
 ![Linux camera controls](assets/images/camera_controls.png)
-<span style="font-size:10pt;">A=auto exposure, E=exposure, G=gain, B=brightness, C=contrast</span>
+*(A=auto exposure, E=exposure, G=gain, B=brightness, C=contrast)*
 
 Doing this I've been observing gains from 15 fps -> 30 fps (or more, depending on the webcam hardware!).
