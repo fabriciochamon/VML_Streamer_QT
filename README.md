@@ -76,6 +76,8 @@ class ViveStream:
 
 ## Step 2 - add main properties
 
+Create a label and optionally extra configuration fields for your new stream type.
+
 ```python
 class ViveStream:
 	def __init__(self):
