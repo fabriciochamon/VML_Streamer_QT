@@ -18,7 +18,7 @@ Video is sent as a flattened numpy array (0-255 RGB values)<br/>
 Data is sent as a json string (dumped python dict)
 
 \**This program was made as a utility tool for Sidefx Houdini, but nothing 
-hold you back from using it as a generic data server to feed your 
+stops you from using it as a generic data server to feed your 
 own udp client that decodes the data.*
 
 # Installation
