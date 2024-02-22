@@ -183,7 +183,7 @@ Check *vml-streamer/_st_stream_template.py* for a complete documented example!
 
 ## Files and folders
 - vml-streamer/main.spec file is already provided to facilitate the build process.
-- The .spec file is setup to generate a single executable (i.e.: "one-file" option)
+- The .spec file is setup to generate a single executable (i.e.: "one-file" option, no installation required!)
 - If you add custom stream types, use the "models" subfolder to store extra required bin files. They all get included in the final executable.
 - Because one-file is used, all depdendencies get extracted to a temp folder at runtime. You will NOT be able to use relative paths to, for example, load a binary file from "models". Instead, please "import resources" and get the absolute path by using "resources.getPath('./models/my-resource.ext')"
 
