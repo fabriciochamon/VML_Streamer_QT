@@ -1,6 +1,4 @@
-<!-- Splash logo
-![VML Streamer Splash](assets/images/vml_streamer_splash.png)
--->
+**Downloads available on the [Releases page](https://github.com/fabriciochamon/VML_Streamer_QT/releases).**
 
 # VML_Streamer (Qt)
 Vision and Machine Learning data streamer for 
