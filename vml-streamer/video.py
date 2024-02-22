@@ -77,7 +77,7 @@ class VideoThread(QtCore.QThread):
 
 			# openCv capture
 			capture = cv2.VideoCapture(self.source_file, self.capture_api)
-			capture.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'MJPG'))
+			#capture.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'MJPG'))
 
 			# get/set webcam properties
 			if self.source_type=='webcam':

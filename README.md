@@ -223,3 +223,14 @@ VML Streamer is based on Qt for its user interface. Qt uses the QMediaDevices cl
 This can happen on Linux machines reading logitech webcams. 
 (This is a problem related to libjpeg, as stated [here](https://github.com/opencv/opencv/issues/9477#issuecomment-390679150), and should not compromise the program functionality)
 
+# ![Linux logo](assets/images/linux_logo.png) Tips for Linux users
+
+## Increasing webcam fps
+The v4l2 camera exposure setting has a big impact on fps. Often times you might want
+to turn off "auto exposure" and lower the manual exposure setting. To compensate for the darker image, 
+increase gain/brightness and you should now have a much faster camera read speed.
+
+![Linux camera controls](assets/images/camera_controls.png)
+<span style="font-size:10pt;">A=auto exposure, E=exposure, G=gain, B=brightness, C=contrast</span>
+
+Doing this I've been observing gains from 15 fps -> 30 fps (or more, depending on the webcam hardware!).

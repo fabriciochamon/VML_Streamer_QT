@@ -154,6 +154,51 @@ class MainWindow(QtWidgets.QWidget):
 		self.video_info.setObjectName('video_info')
 		qt_utils.addRow(layout=self.layout_main, widgets=self.video_info, centered=True)
 
+		# webcam controls (exposure, gain, etc)
+		self.cam_autoexposure_label = QtWidgets.QLabel('A')
+		self.cam_autoexposure_label.setToolTip('Enable auto exposure')
+		self.cam_autoexposure_label.setVisible(False)
+		self.cam_autoexposure = QtWidgets.QCheckBox()
+		self.cam_autoexposure.stateChanged.connect(lambda state: self.change_cam_autoexposure(state==2))
+		self.cam_autoexposure.setVisible(False)
+		self.cam_exposure_label = QtWidgets.QLabel('E')
+		self.cam_exposure_label.setToolTip('exposure')
+		self.cam_exposure_label.setVisible(False)
+		self.cam_exposure = QtWidgets.QSlider(QtCore.Qt.Horizontal)
+		self.cam_exposure.sliderReleased.connect(self.change_cam_exposure)
+		self.cam_exposure.setVisible(False)
+		self.cam_gain_label = QtWidgets.QLabel('G')
+		self.cam_gain_label.setToolTip('gain')
+		self.cam_gain_label.setVisible(False)
+		self.cam_gain = QtWidgets.QSlider(QtCore.Qt.Horizontal)
+		self.cam_gain.sliderReleased.connect(self.change_cam_gain)
+		self.cam_gain.setVisible(False)
+		self.cam_brightness_label = QtWidgets.QLabel('B')
+		self.cam_brightness_label.setToolTip('brightness')
+		self.cam_brightness_label.setVisible(False)
+		self.cam_brightness = QtWidgets.QSlider(QtCore.Qt.Horizontal)
+		self.cam_brightness.sliderReleased.connect(self.change_cam_brightness)
+		self.cam_brightness.setVisible(False)
+		self.cam_contrast_label = QtWidgets.QLabel('C')
+		self.cam_contrast_label.setToolTip('contrast')
+		self.cam_contrast_label.setVisible(False)
+		self.cam_contrast = QtWidgets.QSlider(QtCore.Qt.Horizontal)
+		self.cam_contrast.sliderReleased.connect(self.change_cam_contrast)
+		self.cam_contrast.setVisible(False)
+		webcam_controls_widgets = [
+			self.cam_autoexposure_label,
+			self.cam_autoexposure,
+			self.cam_exposure_label,
+			self.cam_exposure,
+			self.cam_gain_label,
+			self.cam_gain,
+			self.cam_brightness_label,
+			self.cam_brightness,
+			self.cam_contrast_label,
+			self.cam_contrast,
+		]
+		qt_utils.addRow(layout=self.layout_main, widgets=webcam_controls_widgets)
+
 		# streams
 		self.streams = []
 		btn_add_stream = QtWidgets.QPushButton('+ Add stream')
@@ -213,6 +258,7 @@ class MainWindow(QtWidgets.QWidget):
 			self.videosettings_grp.hide()
 			self.webcamsettings_grp.hide()
 			self.combo_devices.setCurrentIndex(0)
+			self.Display_CamControls(False)
 
 		# webcam
 		elif src == 'Webcam':
@@ -225,6 +271,7 @@ class MainWindow(QtWidgets.QWidget):
 		elif src == 'Video file':
 			self.setVideoEmpty()
 			self.webcamsettings_grp.hide()
+			self.Display_CamControls(False)
 			self.combo_devices.setCurrentIndex(0)
 			if self.show_settings:
 				self.videosettings_grp.show()
@@ -234,6 +281,18 @@ class MainWindow(QtWidgets.QWidget):
 	def ChangeCaptureApi(self, idx):
 		self.VideoThread.capture_api = self.cap_apis.itemData(idx)
 		self.restartVideo()
+
+	def Display_CamControls(self, bvalue):
+		self.cam_autoexposure.setVisible(bvalue)
+		self.cam_autoexposure_label.setVisible(bvalue)
+		self.cam_exposure.setVisible(bvalue)
+		self.cam_exposure_label.setVisible(bvalue)
+		self.cam_gain.setVisible(bvalue)
+		self.cam_gain_label.setVisible(bvalue)
+		self.cam_brightness.setVisible(bvalue)
+		self.cam_brightness_label.setVisible(bvalue)
+		self.cam_contrast.setVisible(bvalue)
+		self.cam_contrast_label.setVisible(bvalue)
 
 	@QtCore.Slot()
 	def ChangeDevice(self, idx):
@@ -252,6 +311,31 @@ class MainWindow(QtWidgets.QWidget):
 			self.VideoThread.source_file = chosen_device['id']
 			self.VideoThread.resolution = [int(item) for item in self.combo_resolutions.currentText().split('x')]
 			self.restartVideo()
+
+			# show camera controls (Linux only!)
+			if platform.system() == 'Linux':
+				if chosen_device['path'] != '':
+
+					self.Display_CamControls(True)
+
+					ctrls = device_info.get_v4l2_ctrls(chosen_device['path'])
+					self.cam_autoexposure.setChecked([x['value'] for x in ctrls if x['name']=='auto_exposure'][0])
+
+					self.cam_exposure.setMinimum([x['min'] for x in ctrls if x['name']=='exposure_time_absolute'][0])
+					self.cam_exposure.setMaximum([x['max'] for x in ctrls if x['name']=='exposure_time_absolute'][0])
+					self.cam_exposure.setValue([x['value'] for x in ctrls if x['name']=='exposure_time_absolute'][0])
+
+					self.cam_gain.setMinimum([x['min'] for x in ctrls if x['name']=='gain'][0])
+					self.cam_gain.setMaximum([x['max'] for x in ctrls if x['name']=='gain'][0])
+					self.cam_gain.setValue([x['value'] for x in ctrls if x['name']=='gain'][0])
+
+					self.cam_brightness.setMinimum([x['min'] for x in ctrls if x['name']=='brightness'][0])
+					self.cam_brightness.setMaximum([x['max'] for x in ctrls if x['name']=='brightness'][0])
+					self.cam_brightness.setValue([x['value'] for x in ctrls if x['name']=='brightness'][0])
+
+					self.cam_contrast.setMinimum([x['min'] for x in ctrls if x['name']=='contrast'][0])
+					self.cam_contrast.setMaximum([x['max'] for x in ctrls if x['name']=='contrast'][0])
+					self.cam_contrast.setValue([x['value'] for x in ctrls if x['name']=='contrast'][0])
 
 	@QtCore.Slot()
 	def ChangeResolution(self, resolution):
@@ -377,6 +461,37 @@ class MainWindow(QtWidgets.QWidget):
 	@QtCore.Slot()
 	def ChangeStreamSettings(self, stream_id, setting_name, new_value):
 		self.streams[self.findStreamIndexById(stream_id)]['settings'][setting_name] = new_value
+
+	@QtCore.Slot()
+	def change_cam_autoexposure(self, value):
+		chosen_device = [device for device in self.devices if device['name']==self.combo_devices.currentText()][0]
+		device_info.set_v4l2_config(chosen_device['path'], 'auto_exposure', 3 if value else 1)
+		ctrls = device_info.get_v4l2_ctrls(chosen_device['path'])
+		self.cam_exposure.setValue([x['value'] for x in ctrls if x['name']=='exposure_time_absolute'][0])
+
+	@QtCore.Slot()
+	def change_cam_exposure(self):
+		value = self.cam_exposure.value()
+		chosen_device = [device for device in self.devices if device['name']==self.combo_devices.currentText()][0]
+		device_info.set_v4l2_config(chosen_device['path'], 'exposure_time_absolute', value)
+
+	@QtCore.Slot()
+	def change_cam_gain(self):
+		value = self.cam_gain.value()
+		chosen_device = [device for device in self.devices if device['name']==self.combo_devices.currentText()][0]
+		device_info.set_v4l2_config(chosen_device['path'], 'gain', value)
+
+	@QtCore.Slot()
+	def change_cam_brightness(self):
+		value = self.cam_brightness.value()
+		chosen_device = [device for device in self.devices if device['name']==self.combo_devices.currentText()][0]
+		device_info.set_v4l2_config(chosen_device['path'], 'brightness', value)
+
+	@QtCore.Slot()
+	def change_cam_contrast(self):
+		value = self.cam_contrast.value()
+		chosen_device = [device for device in self.devices if device['name']==self.combo_devices.currentText()][0]
+		device_info.set_v4l2_config(chosen_device['path'], 'contrast', value)
 		
 	@QtCore.Slot()
 	def ShowHideUI(self, widget_names, state, isSettings=False):
