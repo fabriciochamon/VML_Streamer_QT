@@ -11,9 +11,6 @@ Vision ML contains a set of decoder nodes for VML Streamer, plus a few utility n
 
 All nodes will appear under the "Vision ML" tab menu category.
 
-
-Check (/sample_scenes) folder.
-
 ---
 ## VML Streamer direct launch
 To be able to tab > VML Streamer and launch the standalone app right inside Houdini, 
