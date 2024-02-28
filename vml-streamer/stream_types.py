@@ -74,6 +74,16 @@ def getQtWidget(stream=None, caller=None, inline=False):
 			combo_type.setItemData(i, instance.description, QtCore.Qt.ToolTipRole)
 			combo_type.setToolTipDuration(5)
 
+		# needs video input?
+		needs_video_input = QtWidgets.QCheckBox(f'{stream_name}__{label}__needsVideoInput')
+		needs_video_input.setObjectName(f'{stream_name}__{label}__needsVideoInput')
+		needs_video_input.setChecked(True)
+		needs_video_input.setVisible(False)
+		if hasattr(instance, 'needs_video_input'):
+			needs_video_input.setChecked(instance.needs_video_input)
+		all_widgets.extend([needs_video_input])
+		layout_main.addWidget(needs_video_input)
+
 		# extra settings per type
 		grp_settings = QtWidgets.QGroupBox('Settings:')
 		grp_settings.setObjectName(f'{stream_name}__settings__{label}')
@@ -121,6 +131,24 @@ def getQtWidget(stream=None, caller=None, inline=False):
 					wid.setProperty('class', 'stream_extra_settings')
 					wid.textChanged.connect(lambda new_value, setting=setting: caller.ChangeStreamSettings(stream['id'], setting['name'], new_value))
 					if 'default_value' in setting.keys(): wid.setText(setting['default_value'])
+					layout_settings.addRow(wid_label, wid)
+
+				# handle list type
+				elif setting['type'] == list:
+					default_value = setting['default_value'] or []
+					is_list_of_dict = False
+					if len(default_value) and isinstance(default_value[0], dict):
+						is_list_of_dict = True
+					wid = QtWidgets.QComboBox()
+					wid.setProperty('class', 'stream_extra_settings')
+					for n, item in enumerate(default_value):
+						if not is_list_of_dict:
+							wid.addItem(str(item))
+							wid.setItemData(n, item)
+						else:
+							wid.addItem(str(list(item.keys())[0]))
+							wid.setItemData(n, item[list(item.keys())[0]])
+					wid.currentIndexChanged.connect(lambda new_value, setting=setting, object_name=setting_name: caller.ChangeStreamSettings(stream['id'], setting['name'], new_value, object_name))
 					layout_settings.addRow(wid_label, wid)
 
 				wid.setObjectName(setting_name)

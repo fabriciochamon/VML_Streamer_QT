@@ -216,6 +216,11 @@ class MainWindow(QtWidgets.QWidget):
 		# init empty video
 		self.ChangeVideoSource('None')
 
+		# defined timer (timed calls) for non-video based streams
+		self.stream_calls_timer = QtCore.QTimer()
+		self.stream_calls_timer.timeout.connect(self.StreamNoVideoInput)
+		self.stream_calls_timer.start(30) # in millisecond
+
 	# main window close event
 	def closeEvent(self, event):
 		self.VideoThread.stop()
@@ -396,6 +401,7 @@ class MainWindow(QtWidgets.QWidget):
 			'address': '127.0.0.1',
 			'port': max([item['port'] for item in self.streams])+1 if len(self.streams) else 11111,
 			'settings': {},
+			'needs_video_input': True,
 		}
 		self.streams.append(new_stream)
 		stream_layout = stream_types.getQtWidget(new_stream, self)
@@ -447,8 +453,18 @@ class MainWindow(QtWidgets.QWidget):
 					self.streams[stream_idx]['settings'][setting_name] = s.value
 				if isinstance(s, QtWidgets.QLineEdit):
 					self.streams[stream_idx]['settings'][setting_name] = s.text()
+				if isinstance(s, QtWidgets.QComboBox):
+					self.streams[stream_idx]['settings'][setting_name] = s.itemData(s.currentIndex())
 			else:
 				self.streams[stream_idx]['settings'] = {}	
+
+		# update "needs_video_input" stream key
+		pattern = f'stream{stream_id}__{chosen_item}__needsVideoInput'		
+		regex = QtCore.QRegularExpression(pattern)
+		needs_video_input = True
+		needs_video_input_checkbox = self.findChildren(QtCore.QObject, regex, QtCore.Qt.FindChildrenRecursively)
+		if len(needs_video_input_checkbox): needs_video_input = needs_video_input_checkbox[0].isChecked()
+		self.streams[stream_idx]['needs_video_input'] = needs_video_input
 
 	@QtCore.Slot()
 	def ChangeStreamAddr(self, address, stream_id):
@@ -459,7 +475,9 @@ class MainWindow(QtWidgets.QWidget):
 		self.streams[self.findStreamIndexById(stream_id)]['port'] = port
 
 	@QtCore.Slot()
-	def ChangeStreamSettings(self, stream_id, setting_name, new_value):
+	def ChangeStreamSettings(self, stream_id, setting_name, new_value, object_name=None):
+		if object_name is not None:
+			new_value = self.findChildren(QtCore.QObject, object_name, QtCore.Qt.FindChildrenRecursively)[0].itemData(new_value)
 		self.streams[self.findStreamIndexById(stream_id)]['settings'][setting_name] = new_value
 
 	@QtCore.Slot()
@@ -530,12 +548,14 @@ class MainWindow(QtWidgets.QWidget):
 		self.ImageUpdate(QtGui.QImage(resources.getPath('images/no_video.png')))
 		self.video_info.setText(f'fps: 0.0 (api: none)')
 
-	def Stream(self):
+	def Stream(self, video_based=True):
 		if self.VideoThread.imageRGB is not None:
-			for i, stream in enumerate(self.streams):
+			filtered_streams = [x for x in self.streams if x['needs_video_input']==video_based]
+			for stream in filtered_streams:
 				
 				data = stream_types.getProcessors()[stream['type']].run(self.VideoThread, stream, self.streams)
-				self.streams[i]['data'] = data
+				stream_idx = [i for i, x in enumerate(self.streams) if x['id']==stream['id']][0]
+				self.streams[stream_idx]['data'] = data
 				
 				if data is not None:
 					addr_port = (stream['address'], stream['port'])
@@ -548,6 +568,9 @@ class MainWindow(QtWidgets.QWidget):
 					elif isinstance(data, np.ndarray):
 						skt.sendto(data.tobytes(), addr_port)
 
+	@QtCore.Slot()
+	def StreamNoVideoInput(self):
+		if len(self.streams): self.Stream(video_based=False)
 			
 # main program
 if __name__ == '__main__':

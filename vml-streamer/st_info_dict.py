@@ -3,8 +3,7 @@ class InfoDict:
 	def __init__(self):
 		self.label = 'Info Dictionary'
 		self.description = 'Sends a python dict with information about the input video source.'
-		self.settings = []
-
+		
 	def run(self, video, stream, streams):
 		info = {}
 		info['image_width']  = int(video.resolution[0])

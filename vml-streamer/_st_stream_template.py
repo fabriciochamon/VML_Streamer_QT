@@ -4,7 +4,7 @@
 
 '''
 This is a simple template for a new stream type. 
-In this example we will stream the video resolution, multiplied by a custom value, and along with some custom text.
+In this example we will stream the video resolution, multiplied by a custom value, and along with some custom text and a custom item choice from a list.
 
 Stream types are defined as simple classes, living inside their own python files. 
 The python file must start with "st_", so when VML Streamer starts it will parse the file attributes, 
@@ -35,6 +35,7 @@ class MyCustomStream:
 			- bool  (shown as a checkbox)
 			- float (shown as a slider)
 			- str   (shown as an input text field)
+			- list  (shown as a combo box)
 
 		A field dict is formatted as follows:
 			
@@ -80,6 +81,15 @@ class MyCustomStream:
 				'type': str,
 				'default_value': 'This is a custom string.',
 			},
+
+			# a combo box field
+			{
+				'name': 'choices',
+				'label': 'Choices',
+				'description': 'Choose an item from the list',
+				'type': list,
+				'default_value': ['Item A', 'Item B', 'Item C'],  # it can also accept a list of dicts, where key=label and value=value
+			},
 		]
 
 	'''
@@ -119,6 +129,7 @@ class MyCustomStream:
 			'res_X': video.resolution[0],
 			'res_Y': video.resolution[1],
 			'text':  settings['extra_text'],
+			'chosen_item': settings['choice'],
 		}
 
 		if settings['do_mult_resolution']:
