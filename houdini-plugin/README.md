@@ -12,7 +12,7 @@ Vision ML contains a set of decoder nodes for VML Streamer, plus a few utility n
 All nodes will appear under the "Vision ML" tab menu category.
 
 
-Check [test] (sample_scenes).
+Check (sample_scenes).
 
 ---
 ## VML Streamer direct launch
