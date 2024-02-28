@@ -549,10 +549,9 @@ class MainWindow(QtWidgets.QWidget):
 		self.video_info.setText(f'fps: 0.0 (api: none)')
 
 	def Stream(self, video_based=True):
-		if self.VideoThread.imageRGB is not None:
-			filtered_streams = [x for x in self.streams if x['needs_video_input']==video_based]
-			for stream in filtered_streams:
-				
+		filtered_streams = [x for x in self.streams if x['needs_video_input']==video_based]
+		if not video_based or (video_based and self.VideoThread.imageRGB is not None):			
+			for stream in filtered_streams:				
 				data = stream_types.getProcessors()[stream['type']].run(self.VideoThread, stream, self.streams)
 				stream_idx = [i for i, x in enumerate(self.streams) if x['id']==stream['id']][0]
 				self.streams[stream_idx]['data'] = data
