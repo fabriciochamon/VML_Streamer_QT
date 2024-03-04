@@ -39,7 +39,7 @@ So consider recreating your virtual environment by hand:
 	venv/Scripts/activate    # on Windows
 	
 	# install modules ("pyinstaller" only needed if you'll build binaries)
-	pip install opencv-python mediapipe PySide6 pyinstaller
+	pip install opencv-python mediapipe websocket-client PySide6 pyinstaller
 
 ## Running:
 
@@ -113,6 +113,15 @@ class ViveStream:
 				'type': str,
 				'default_value': 'This is a custom string.',
 			},
+			
+			# a combo box field
+			{
+				'name': 'choices',
+				'label': 'Choices',
+				'description': 'The chosen item will be sent along with the stream.',
+				'type': list,
+				'default_value': ['Item A', 'Item B', 'Item C'],  # also accepts a list of dicts
+			},
 
 		]
 ```
@@ -144,6 +153,7 @@ class ViveStream:
 			'Y': 2.3,
 			'Z': 0.7,
 			'text':  settings['extra_text'],
+			'chosen_item': settings['choice'],
 		}
 
 		# logic

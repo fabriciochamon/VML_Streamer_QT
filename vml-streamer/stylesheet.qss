@@ -68,6 +68,12 @@ GENERAL STYLES
     background-color: rgb(50, 50, 50);
 }
 
+.info_box_rich{
+    background-color: rgb(58, 58, 58);
+    border: 0px solid black;
+    font-size: 8pt;
+}
+
 a {
     color: yellow;
 }
@@ -78,6 +84,7 @@ QWidget
     margin: 0;
     background-color: rgb(58, 58, 58);
     color: white;
+    font-size:8pt;
 }
 
 QWidget[transparent="true"]
@@ -116,7 +123,7 @@ QCheckBox::indicator
 }
 
 QComboBox{
-    background-color: rgb(80,80,80);
+    background-color: rgb(100,100,100);
     border-style: solid;
 }
 
@@ -1141,6 +1148,7 @@ QToolTip {
     border: solid 1px rgb(0, 0, 0);
     background: rgb(0, 0, 0);
     color: rgb(204, 204, 204);
+    font-size:10pt;
 }
 
 /******************************************************************************

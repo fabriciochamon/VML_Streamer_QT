@@ -268,4 +268,6 @@ def getCheckboxVisibilityIconStyleSheet():
 	style += '.display_UI_group::indicator:checked:hover{image: url('+eyeHOVER+');}'
 	style += '.display_UI_group::indicator:unchecked:hover{image: url('+eyeHOVER+');}'
 
+	style += '.display_UI_group{font-size: 8pt;}'
+
 	return style

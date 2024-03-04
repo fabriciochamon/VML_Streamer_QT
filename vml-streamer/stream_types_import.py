@@ -1,5 +1,6 @@
-import st_info_dict
+import st_android_sensors
 import st_mp_body
 import st_mp_face
 import st_mp_hands
 import st_video
+import st_video_info

@@ -3,52 +3,64 @@
 # ---------------------------------------------------------------------------- #
 
 '''
-This is a simple template for a new stream type. 
-In this example we will stream the video resolution, multiplied by a custom value, and along with some custom text and a custom item choice from a list.
-
-Stream types are defined as simple classes, living inside their own python files. 
-The python file must start with "st_", so when VML Streamer starts it will parse the file attributes, 
-and make the new stream type available in the UI.
+This is a template for a new stream type. 
+In this example we will stream the video resolution multiplied by a custom value, along with some extra info.
+Stream types are defined as classes living inside their own python files. 
+The python file must start with "st_" for VML Streamer to pick up the new stream type.
 '''
 
-class MyCustomStream:
+class ExampleStream:
 	'''
 	The class needs at least 2 methods:
-	  > __init__() where you define stream properties, like label, description and config settings.
-	  >   run()    where you return data to be sent through sockets. Return types available:
+	  > __init__() constructor where you define stream properties, like label, description and config settings.
+	  >   run()    where you return the data that is sent from VML Streamer. Return types available are:
 	  			     - dict: sent as a dumped json string
 	  	           	 - numpy array: sent as a video frame (flattened list of uint8: 0-255 rgb values)
+   	 
+   	 And offers an optional method:
+   	  > terminate() fired when user deletes the stream instance from the UI (use it cleanup resources, close connections, etc.)
 	'''
 	def __init__(self):
 		
-		# define the stream type name shown at the combo box
-		self.label = 'Image Resolution'  
+		# label shown in the combo box
+		self.label = 'Example Stream'  
 
-		# define the stream type description shown as a tooltip (when user hovers the item inside the combo box)
-		self.description =  'Sends a python dict with the video resolution '\
-							'(optionally multiplied by a float value), along with some custom text.'
+		# description shown as a tooltip when user hovers the item inside the combo box (accepts html tags)
+		self.description =  'Sends a dict with video resolution and some extra info'
+
+		# (optional, when absent defaults to True)
+		# if needs_video_input == False, VML Streamer won't wait for an available video source to start streaming the data. 
+		self.needs_video_input = True
+
+		# (optional. when absent, defaults to '')
+		# The returned data type from this stream. Shown in the tooltip and helps informing the user on how to decode data coming from this stream.
+		self.return_type = 'dict'		
 
 		'''
 		Below we define optional extra config settings for our new stream type. This should be a list of dicts (more info below).
 
-		At the moment the only supported UI types are:
+		At the moment the supported types are:
 			- bool  (shown as a checkbox)
 			- float (shown as a slider)
-			- str   (shown as an input text field)
+			- int   (shown as a input text field)
+			- str   (shown as an input text field. Or a rich text (html) field, see below!)
 			- list  (shown as a combo box)
 
 		A field dict is formatted as follows:
 			
 			REQUIRED keys: 
-				"name"  (should not contain spaces!)
+				"name"  (unique, should not contain spaces!)
 				"label" (UI display name, can contain spaces and special chars)
-				"type"  (bool | float | str)
+				"type"  (bool | float | str | list)
 			
 			OPTIONAL keys:
 				"default_value" (field initial value)
 				"min_value" (available for float fields only. This is the min value of the slider)
 				"max_value" (available for float fields only. This is the max value of the slider)
 				"description" (extended info shown as a tooltip when user hovers the field label)
+				"ui_type" 
+					- 'html': renders a html field instead of the regular textinput field (for "str")
+					- 'textinput': renders a textinput field instead of the regular slider field (for "float")
 
 		'''
 		self.settings = [
@@ -57,7 +69,7 @@ class MyCustomStream:
 			{
 				'name': 'do_mult_resolution',
 				'label': 'Multiply resolution',
-				'description': 'When checked, the resolution will be multiplied by the "Value" field below.',
+				'description': 'When checked, the resolution will be multiplied.',
 				'type': bool,
 				'default_value': True,
 			},
@@ -86,24 +98,35 @@ class MyCustomStream:
 			{
 				'name': 'choices',
 				'label': 'Choices',
-				'description': 'Choose an item from the list',
+				'description': 'The chosen item will be sent along with the stream.',
 				'type': list,
 				'default_value': ['Item A', 'Item B', 'Item C'],  # it can also accept a list of dicts, where key=label and value=value
 			},
+
+			# an info box
+			{
+				'name': 'info',
+				'label': 'Info',
+				'description': 'Some additional help for the user',
+				'type': str,
+				'ui_type': 'html',  # <-- a read-only, html enabled, multiline field.
+				'default_value': """
+					This info box accepts any kind of <b>html</b> tags. <br><br>Including links: <a href="http://www.sidefx.com">SideFX Houdini</a>.
+				""",
+			},			
 		]
 
 	'''
-	The run() method takes 3 args:
-		- (object) video: The video object containing information about the current frame being displayed in the UI. Things you can access:
+	The "run()" method takes 3 args:
+		- video (object): The object containing information about the current video frame being displayed. Things you can access:
 						video.imageBGR = openCV frame (in BGR channel ordering)
 						video.imageRGB = openCV frame (in RGB channel ordering). 
 						video.imageDISPLAY = image to be displayed in the UI (in RGB channel ordering), you can override this value to annotate images. 
-											 (Make sure to match the np.array shape from video.imageRGB)
 						video.source_type = 'webcam' or 'video'
 						video.source_file = if reading from a webcam it will be the device id (0, for example). If reading from a video file it will be the file path.
 						video.resolution = video resolution in the format [res_X, res_Y]
-						video.frame = if reading from a video file this is the current frame number being displayed (always starts at 1!)
-						video.num_frames = if reading from a video file this is the actual length of the video (total number of frames)
+						video.frame = if reading from a video file, this is the current frame number being displayed (always starts at 1!)
+						video.num_frames = if reading from a video file, this is the actual length of the video in number of frames
 						video.fps = current video/webcam framerate
 						video.source_fps = video file original framerate
 						video.flipImage = if video flipped?
@@ -112,14 +135,14 @@ class MyCustomStream:
 						video.capture_api = openCV video capture backend (as int)
 						video.capture_api_name = openCV video capture backend (as string)
 
-		- (dict) stream: The current stream instance being processed. Things you can access:
+		- stream (dict): The current stream instance being processed. Things you can access:
 						stream['address'] = the IP address to where the data is being sent to
 						stream['port'] = the port to where the data is being sent to
-						stream['settings'] = the actual values of UI fields defined above in the __init__() constructor (keys = field "name")
+						stream['settings'] = the actual values of UI fields defined in the __init__() constructor (keys = field names)
 											 Example: stream['settings']['my_field_name']
 
-		- (list) streams: A list of all stream instances being processed (including self!). You can use this list to access other streams if needed. 
-						  An example use case is accessing data from a previous stream "run()" result into the current stream, like: streams[index]['data']
+		- streams (list): A list of all stream instances being processed (including self). You can use this list to access data from other streams if needed. 
+						  Example: streams[index]['data']  (order of operation follows the UI, you can only access current data from previous streams)
 	'''
 	def run(self, video, stream, streams):
 
@@ -137,3 +160,8 @@ class MyCustomStream:
 			data['res_Y'] *= settings['mult_resolution_value']
 
 		return data
+
+	# (optional)
+	# close connections, cleanup resources, etc
+	def terminate(self):
+		pass

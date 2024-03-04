@@ -3,17 +3,15 @@ import os
 # fix MSMF video capture api slowness on windows!
 os.environ['OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS'] = '0'
 
-import sys, cv2, platform, time, socket, json
+import sys, cv2, platform, time, json, socket
 import numpy as np
 from PySide6 import QtCore, QtWidgets, QtGui
 from video import VideoThread
+from stream_thread import StreamThread
 import device_info, resources, qt_utils, stream_types
 
 # PyInstaller load splash screen
 if getattr(sys, 'frozen', False): import pyi_splash
-
-# Init socket connection (udp)
-skt = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
 
 # main UI window widget
 class MainWindow(QtWidgets.QWidget):
@@ -22,6 +20,17 @@ class MainWindow(QtWidgets.QWidget):
 
 		self.setWindowTitle('VML Streamer')
 		self.setWindowFlags(self.windowFlags() | QtCore.Qt.WindowStaysOnTopHint)
+
+		# Init UDP socket connection
+		self.skt = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
+
+		# non-video based streams thread
+		self.StreamThread = StreamThread()
+		self.processors = stream_types.getProcessors()
+
+		# opencv video thread
+		self.VideoThread = VideoThread(source_file=-1)
+		self.VideoThread.ImageUpdate.connect(self.ImageUpdate)
 
 		# main layout
 		self.layout_main = QtWidgets.QVBoxLayout(self)
@@ -36,28 +45,27 @@ class MainWindow(QtWidgets.QWidget):
 		self.current_video_source = 'None'
 		check_videosource = QtWidgets.QCheckBox('Source')
 		check_videosource.setProperty('class', 'display_UI_group')
+		check_videosource.setToolTip('Hides video source buttons')
 		check_videosource.setChecked(True)
 		check_videosource.setStyleSheet(qt_utils.getCheckboxVisibilityIconStyleSheet())
 		check_videosource.stateChanged.connect(lambda state: self.ShowHideUI(['grp_video_sources'], state==2))
 
 		check_videosettings = QtWidgets.QCheckBox('Settings')
 		check_videosettings.setProperty('class', 'display_UI_group')
+		check_videosettings.setToolTip('Hides webcam/video settings')
 		check_videosettings.setChecked(True)
 		check_videosettings.setStyleSheet(qt_utils.getCheckboxVisibilityIconStyleSheet())
 		check_videosettings.stateChanged.connect(lambda state: self.ShowHideUI(['webcam_settings_grp', 'videosettings_grp'], state==2, True))
 
 		check_videofeed = QtWidgets.QCheckBox('Video')
 		check_videofeed.setProperty('class', 'display_UI_group')
+		check_videofeed.setToolTip('Hides the video feedback window')
 		check_videofeed.setChecked(True)
 		check_videofeed.setStyleSheet(qt_utils.getCheckboxVisibilityIconStyleSheet())
 		check_videofeed.stateChanged.connect(lambda state: self.ShowHideUI(['video_feedback','video_info'], state==2))
 		
 		top_widgets = [always_on_top, 'spacer:20', check_videosource, check_videosettings, check_videofeed]
 		qt_utils.addRow(self.layout_main, top_widgets)
-
-		# opencv video thread
-		self.VideoThread = VideoThread(source_file=-1)
-		self.VideoThread.ImageUpdate.connect(self.ImageUpdate)
 
 		# video sources (buttons)
 		video_sources = qt_utils.addVideoSourceButtons(['None', 'Webcam', 'Video file'], caller=self)
@@ -110,7 +118,7 @@ class MainWindow(QtWidgets.QWidget):
 		layout_video_settings = QtWidgets.QVBoxLayout()
 
 		# video file settings - file path
-		self.video_file_label = QtWidgets.QLabel('Path:')
+		self.video_file_label = QtWidgets.QLabel('File:')
 		self.video_file_path = QtWidgets.QLineEdit()
 		self.video_file_path.textChanged.connect(self.LoadVideoFromFile)
 		self.video_file_path.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred))
@@ -148,7 +156,7 @@ class MainWindow(QtWidgets.QWidget):
 		qt_utils.addRow(layout=self.layout_main, widgets=self.video_feedback, centered=True)
 		self.video_feedback_width = self.size().width()*0.9
 
-		# video info text (fps,etc)
+		# video info text (fps, api, etc)
 		self.video_info = QtWidgets.QLabel()
 		self.video_info.setProperty('class', 'video_info')
 		self.video_info.setObjectName('video_info')
@@ -216,35 +224,38 @@ class MainWindow(QtWidgets.QWidget):
 		# init empty video
 		self.ChangeVideoSource('None')
 
-		# defined timer (timed calls) for non-video based streams
-		self.stream_calls_timer = QtCore.QTimer()
-		self.stream_calls_timer.timeout.connect(self.StreamNoVideoInput)
-		self.stream_calls_timer.start(30) # in millisecond
+		# start non-video based Streams thread
+		self.StreamThread.VideoThread = self.VideoThread
+		self.StreamThread.streams = self.streams
+		self.StreamThread.processors = stream_types.getProcessors()
+		self.StreamThread.start()
 
 	# main window close event
 	def closeEvent(self, event):
 		self.VideoThread.stop()
 		self.VideoThread.wait()
+		self.StreamThread.stop()
+		self.StreamThread.wait()
 		QtWidgets.QMainWindow.closeEvent(self, event)
 
 	# main window resize event
 	def resizeEvent(self, event):
 		self.video_feedback_width = event.size().width()*0.9
 
-	# ------------------- #
-	#        SLOTS        #
-	# ------------------- #
+	# ----------------------------------- #
+	#        QT SLOTS and Functions       #
+	# ----------------------------------- #
 	@QtCore.Slot()
 	def ImageUpdate(self, image):
 
-		# run streams
-		self.Stream()
+		# stream
+		self.StreamVideoBased()
 
 		# update video feedback
 		vt = self.VideoThread
 		resolution = '' if vt.resolution is None else f' @ {vt.resolution[0]}x{vt.resolution[1]}'
 		pixmap = QtGui.QPixmap.fromImage(image)
-		#pixmap = pixmap.scaledToWidth(self.video_feedback_width)
+		#pixmap = pixmap.scaledToWidth(self.video_feedback_width)  # scale video to window size?
 		self.video_feedback.setPixmap(pixmap)
 		self.video_info.setText(f'fps: {vt.fps:.1f} (api: {vt.capture_api_name}){resolution}')
 
@@ -252,6 +263,34 @@ class MainWindow(QtWidgets.QWidget):
 		player = self.video_player
 		if vt.source_type=='video' and not vt.paused:
 			player.setFrameCurrent(int(vt.frame), emitSignal=False)
+
+	# streams data upon receiving ImageUpdate() signal
+	def StreamVideoBased(self):
+		
+		# loop through streams, filter where needs_video_input=True
+		filtered_streams = [x for x in self.streams if x['needs_video_input']]
+		for stream in filtered_streams:
+			if self.VideoThread.imageRGB is not None:
+				idx = self.streams.index(stream)				
+				data = self.processors[stream['type']].run(self.VideoThread, stream, self.streams)
+				self.streams[idx]['data'] = data
+				
+				# send data through UDP socket
+				if data is not None:
+
+					# ip address field should also accepts a comma delimited list, so we handle that
+					addr_ports = [(addr.strip(), stream['port']) for addr in stream['address'].split(',')]
+
+					for addr_port in addr_ports:
+						
+						# send dict
+						if isinstance(data, dict):
+							self.skt.sendto(json.dumps(data).encode(), addr_port)
+
+						# send numpy array
+						elif isinstance(data, np.ndarray):
+							self.skt.sendto(data.tobytes(), addr_port)
+					
 		
 	@QtCore.Slot()
 	def ChangeVideoSource(self, src):
@@ -321,26 +360,35 @@ class MainWindow(QtWidgets.QWidget):
 			if platform.system() == 'Linux':
 				if chosen_device['path'] != '':
 
-					self.Display_CamControls(True)
-
+					show_controls = False
 					ctrls = device_info.get_v4l2_ctrls(chosen_device['path'])
-					self.cam_autoexposure.setChecked([x['value'] for x in ctrls if x['name']=='auto_exposure'][0])
+					for ctrl in ctrls:
+						c_name = ctrl['name']
+						c_min  = ctrl['min']
+						c_max  = ctrl['min']
+						c_val  = ctrl['value']
 
-					self.cam_exposure.setMinimum([x['min'] for x in ctrls if x['name']=='exposure_time_absolute'][0])
-					self.cam_exposure.setMaximum([x['max'] for x in ctrls if x['name']=='exposure_time_absolute'][0])
-					self.cam_exposure.setValue([x['value'] for x in ctrls if x['name']=='exposure_time_absolute'][0])
+						if c_name == 'auto_exposure':  
+							self.cam_autoexposure.setChecked(c_val)
+						if c_name == 'exposure_time_absolute': 
+							show_controls = True
+							self.cam_exposure.setMinimum(c_min)
+							self.cam_exposure.setMaximum(c_max*0.3)
+							self.cam_exposure.setValue(c_val)
+						if c_name == 'gain': 
+							self.cam_gain.setMinimum(c_min)
+							self.cam_gain.setMaximum(c_max)
+							self.cam_gain.setValue(c_val)
+						if c_name == 'brightness': 
+							self.cam_brightness.setMinimum(c_min)
+							self.cam_brightness.setMaximum(c_max)
+							self.cam_brightness.setValue(c_val)
+						if c_name == 'contrast': 
+							self.cam_contrast.setMinimum(c_min)
+							self.cam_contrast.setMaximum(c_max)
+							self.cam_contrast.setValue(c_val)
 
-					self.cam_gain.setMinimum([x['min'] for x in ctrls if x['name']=='gain'][0])
-					self.cam_gain.setMaximum([x['max'] for x in ctrls if x['name']=='gain'][0])
-					self.cam_gain.setValue([x['value'] for x in ctrls if x['name']=='gain'][0])
-
-					self.cam_brightness.setMinimum([x['min'] for x in ctrls if x['name']=='brightness'][0])
-					self.cam_brightness.setMaximum([x['max'] for x in ctrls if x['name']=='brightness'][0])
-					self.cam_brightness.setValue([x['value'] for x in ctrls if x['name']=='brightness'][0])
-
-					self.cam_contrast.setMinimum([x['min'] for x in ctrls if x['name']=='contrast'][0])
-					self.cam_contrast.setMaximum([x['max'] for x in ctrls if x['name']=='contrast'][0])
-					self.cam_contrast.setValue([x['value'] for x in ctrls if x['name']=='contrast'][0])
+					self.Display_CamControls(show_controls)
 
 	@QtCore.Slot()
 	def ChangeResolution(self, resolution):
@@ -411,10 +459,17 @@ class MainWindow(QtWidgets.QWidget):
 
 	@QtCore.Slot()
 	def RemoveStream(self, stream_id, widgets, layout):
-		
+
 		# remove from streams list
 		for i in range(len(self.streams)):
 			if self.streams[i]['id']==stream_id:
+
+				# terminate
+				proc = self.processors[self.streams[i]['type']]
+				if hasattr(proc, 'terminate') and callable(proc.terminate):
+					proc.terminate()
+
+				# remove from streams list
 				del self.streams[i]
 				break
 
@@ -422,7 +477,7 @@ class MainWindow(QtWidgets.QWidget):
 		for widget in widgets:
 			widget.deleteLater()
 		layout.layout().deleteLater()
-		
+
 	@QtCore.Slot()
 	def ChangeStreamType(self, stream_id, stream_layout, chosen_item):
 		stream_idx = self.findStreamIndexById(stream_id)
@@ -452,7 +507,12 @@ class MainWindow(QtWidgets.QWidget):
 				elif isinstance(s, qt_utils.SliderWithNumbers):
 					self.streams[stream_idx]['settings'][setting_name] = s.value
 				if isinstance(s, QtWidgets.QLineEdit):
-					self.streams[stream_idx]['settings'][setting_name] = s.text()
+					if s.property('value_type') is None:
+						self.streams[stream_idx]['settings'][setting_name] = s.text()
+					elif s.property('value_type') == 'float':
+						self.streams[stream_idx]['settings'][setting_name] = float(s.text())
+					elif s.property('value_type') == 'int':
+						self.streams[stream_idx]['settings'][setting_name] = int(s.text())
 				if isinstance(s, QtWidgets.QComboBox):
 					self.streams[stream_idx]['settings'][setting_name] = s.itemData(s.currentIndex())
 			else:
@@ -475,9 +535,24 @@ class MainWindow(QtWidgets.QWidget):
 		self.streams[self.findStreamIndexById(stream_id)]['port'] = port
 
 	@QtCore.Slot()
-	def ChangeStreamSettings(self, stream_id, setting_name, new_value, object_name=None):
+	def ChangeStreamSettings(self, stream_id, setting_name, new_value, object_name=None, value_type=None):
+		
+		# if object is passed as arg, get value directly from UI
+		# this helps using signals where the current widget value is not passed as arg
 		if object_name is not None:
-			new_value = self.findChildren(QtCore.QObject, object_name, QtCore.Qt.FindChildrenRecursively)[0].itemData(new_value)
+			obj = self.findChildren(QtCore.QObject, object_name, QtCore.Qt.FindChildrenRecursively)[0]
+			if isinstance(obj, QtWidgets.QComboBox):
+				new_value = obj.itemData(new_value)
+			elif isinstance(obj, QtWidgets.QLineEdit):
+				new_value = obj.text()
+
+		# force type
+		if value_type==int:   new_value = int(new_value)
+		if value_type==float: new_value = float(new_value)
+		if value_type==bool:  new_value = bool(new_value)
+		if value_type==str:   new_value = str(new_value)
+
+		# set the new value
 		self.streams[self.findStreamIndexById(stream_id)]['settings'][setting_name] = new_value
 
 	@QtCore.Slot()
@@ -547,39 +622,11 @@ class MainWindow(QtWidgets.QWidget):
 		self.VideoThread.frameCounter = 0
 		self.ImageUpdate(QtGui.QImage(resources.getPath('images/no_video.png')))
 		self.video_info.setText(f'fps: 0.0 (api: none)')
-
-	def Stream(self, video_based=True):
-		filtered_streams = [x for x in self.streams if x['needs_video_input']==video_based]
-		if not video_based or (video_based and self.VideoThread.imageRGB is not None):			
-			for stream in filtered_streams:				
-				data = stream_types.getProcessors()[stream['type']].run(self.VideoThread, stream, self.streams)
-				stream_idx = [i for i, x in enumerate(self.streams) if x['id']==stream['id']][0]
-				self.streams[stream_idx]['data'] = data
-				
-				if data is not None:
-					addr_port = (stream['address'], stream['port'])
-
-					# send dicts
-					if isinstance(data, dict):
-						skt.sendto(json.dumps(data).encode(), addr_port)
-
-					# send numpy arrays
-					elif isinstance(data, np.ndarray):
-						skt.sendto(data.tobytes(), addr_port)
-
-	@QtCore.Slot()
-	def StreamNoVideoInput(self):
-		if len(self.streams): self.Stream(video_based=False)
 			
 # main program
 if __name__ == '__main__':
 	app = QtWidgets.QApplication([])
 	
-	# set app font size
-	font = QtGui.QFont()
-	font.setPointSize(8)
-	app.setFont(font)
-
 	# apply stylesheet
 	stylesheet_path = resources.getPath('stylesheet.qss')
 	with open(stylesheet_path, 'r') as stylesheet_file:

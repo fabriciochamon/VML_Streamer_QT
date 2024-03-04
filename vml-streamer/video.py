@@ -151,7 +151,7 @@ class VideoThread(QtCore.QThread):
 		self.ThreadActive = False
 		self.quit()
 
-	# converts openCV RGB image into q QtImage
+	# converts openCV RGB image into a QtImage
 	def convertToQtImage(self, image):
 		return QtGui.QImage(image.data, image.shape[1], image.shape[0], QtGui.QImage.Format_RGB888)
 

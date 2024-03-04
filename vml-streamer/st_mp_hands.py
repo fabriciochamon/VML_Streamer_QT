@@ -12,13 +12,14 @@ class MediaPipeHands:
 	def __init__(self):
 		self.label = 'MediaPipe - Hands'
 		self.description = 'Sends hand trackers from MediaPipe'
+		self.return_type = 'dict'
 		self.settings = [
 			{
 				'name': 'motion_filter',
 				'label': 'Motion Filter',
-				'description':  'Applies as "One-Euro" filter over the input signal. '\
-								'One-Euro is ideal for realtime data, since its fast '\
-								'and only requires two time samples (current and previous frame).',
+				'description':  'Applies as "One-Euro" filter over the input signal. <br><br>'\
+								'<small><font color=grey>One-Euro is ideal for realtime data, since its fast '\
+								'and only requires two time samples (current and previous frame).</font></small>',
 				'type': bool,
 				'default_value': True,
 			},
@@ -52,8 +53,8 @@ class MediaPipeHands:
 		# take control of when to send the data 
 		# through the socket connection
 
-		# socket info
-		self.addr_port = (stream['address'], stream['port'])
+		# ip address field should also accepts a comma delimited list, so we handle that
+		self.addr_ports = [(addr.strip(), stream['port']) for addr in stream['address'].split(',')]
 		
 		# should annotate image ?
 		self.annotate = settings['draw']
@@ -208,7 +209,8 @@ class MediaPipeHands:
 
 		
 		# send data through socket
-		self.skt.sendto(json.dumps(self.joints).encode(), self.addr_port)
+		for addr_port in self.addr_ports:
+			self.skt.sendto(json.dumps(self.joints).encode(), addr_port)
 
 		# update video feedback with annotated image
 		if self.annotate:
@@ -219,3 +221,7 @@ class MediaPipeHands:
 	# helper function to remap value
 	def change_range(self, unscaled, from_min, from_max, to_min, to_max):
 		return (to_max-to_min)*(unscaled-from_min)/(from_max-from_min)+to_min
+
+	# terminate
+	def terminate(self):
+		self.video.imageDISPLAY = None

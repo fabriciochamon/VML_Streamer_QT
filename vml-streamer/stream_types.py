@@ -44,15 +44,18 @@ def getQtWidget(stream=None, caller=None, inline=False):
 
 	# address/port
 	widgets = []
+	addr_label = QtWidgets.QLabel('Address:')
+	addr_label.setToolTip('Accepts single IP or comma delimited list of IP addresses')
 	addr = QtWidgets.QLineEdit(stream['address'])
 	addr.setProperty('class', 'stream_extra_settings')
-	addr.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred))
+	addr.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred))	
 	addr.textChanged.connect(lambda new_address: caller.ChangeStreamAddr(new_address, stream['id']))
+	port_label = QtWidgets.QLabel('Port:')
 	port = QtWidgets.QLineEdit(str(stream['port']))
 	port.setProperty('class', 'stream_extra_settings')
 	port.setMaximumWidth(60)
 	port.textChanged.connect(lambda new_port: caller.ChangeStreamPort(int(new_port), stream['id']))
-	widgets.extend([QtWidgets.QLabel('Address:'), addr, QtWidgets.QLabel('Port:'), port])
+	widgets.extend([addr_label, addr, port_label, port])
 	qt_utils.addRow(layout_main, widgets, add_stretches=False)
 	all_widgets.extend(widgets)
 
@@ -70,8 +73,9 @@ def getQtWidget(stream=None, caller=None, inline=False):
 		
 		# combo item
 		combo_type.addItem(label)
+		return_type = f'({instance.return_type}) ' if hasattr(instance, 'return_type') else ''
 		if hasattr(instance, 'description'):
-			combo_type.setItemData(i, instance.description, QtCore.Qt.ToolTipRole)
+			combo_type.setItemData(i, f'{return_type}{instance.description}', QtCore.Qt.ToolTipRole)
 			combo_type.setToolTipDuration(5)
 
 		# needs video input?
@@ -100,13 +104,24 @@ def getQtWidget(stream=None, caller=None, inline=False):
 				wid_label = QtWidgets.QLabel(setting['label'])
 				if 'description' in setting.keys():
 					tooltip = QtWidgets.QToolTip()
-					wid_label.setToolTip(setting['description'])
+					wid_label.setToolTip(f'<html><body>{setting["description"]}</body></html>')
 					
 				# handle boolean type
 				if setting['type'] == bool:
 					wid = QtWidgets.QCheckBox()
 					wid.stateChanged.connect(lambda new_value, setting=setting: caller.ChangeStreamSettings(stream['id'], setting['name'], new_value==2))
 					if 'default_value' in setting.keys(): wid.setChecked(setting['default_value'])
+					layout_settings.addRow(wid_label, wid)
+
+				# handle int type
+				elif setting['type'] == int:
+
+					# default: textinput
+					wid = QtWidgets.QLineEdit()
+					wid.setProperty('class', 'stream_extra_settings')
+					wid.setProperty('value_type', 'int')
+					wid.returnPressed.connect(lambda setting=setting, setting_name=setting_name: caller.ChangeStreamSettings(stream['id'], setting['name'], None, object_name=setting_name, value_type=int))
+					if 'default_value' in setting.keys(): wid.setText(str(setting['default_value']))
 					layout_settings.addRow(wid_label, wid)
 
 				# handle float type
@@ -121,16 +136,45 @@ def getQtWidget(stream=None, caller=None, inline=False):
 						min_value = 0
 						max_value = default_value*2
 
-					wid = qt_utils.SliderWithNumbers(min_value, max_value, default_value)
-					wid.slider.valueChanged.connect(lambda new_value, setting=setting: caller.ChangeStreamSettings(stream['id'], setting['name'], new_value/10))
+					# default: slider
+					if not 'ui_type' in setting.keys():
+						wid = qt_utils.SliderWithNumbers(min_value, max_value, default_value)
+						wid.slider.valueChanged.connect(lambda new_value, setting=setting: caller.ChangeStreamSettings(stream['id'], setting['name'], new_value/10))
+
+					else:
+
+						# textinput
+						if setting['ui_type'] == 'textinput':
+							wid = QtWidgets.QLineEdit()
+							wid.setProperty('class', 'stream_extra_settings')
+							wid.setProperty('value_type', 'float')
+							wid.returnPressed.connect(lambda setting=setting, setting_name=setting_name: caller.ChangeStreamSettings(stream['id'], setting['name'], None, object_name=setting_name, value_type=float))
+							if 'default_value' in setting.keys(): wid.setText(str(setting['default_value']))
+					
 					layout_settings.addRow(wid_label, wid)
 
 				# handle string type
 				elif setting['type'] == str:
-					wid = QtWidgets.QLineEdit()
-					wid.setProperty('class', 'stream_extra_settings')
-					wid.textChanged.connect(lambda new_value, setting=setting: caller.ChangeStreamSettings(stream['id'], setting['name'], new_value))
-					if 'default_value' in setting.keys(): wid.setText(setting['default_value'])
+
+					# default: line edit
+					if not 'ui_type' in setting.keys():
+						wid = QtWidgets.QLineEdit()
+						wid.setProperty('class', 'stream_extra_settings')
+						wid.returnPressed.connect(lambda setting=setting, setting_name=setting_name: caller.ChangeStreamSettings(stream['id'], setting['name'], None, object_name=setting_name, value_type=str))
+						if 'default_value' in setting.keys(): wid.setText(setting['default_value'])
+					
+					else:
+
+						# html field
+						if setting['ui_type'] == 'html':
+							wid = QtWidgets.QLabel()
+							style='a{color: yellow;}'
+							html = '<html><head><style>'+style+'</style></head><body>'+setting['default_value']+'</body></html>'
+							wid.setText(html)
+							wid.setOpenExternalLinks(True)
+							wid.setWordWrap(True)
+							wid.setProperty('class', 'info_box_rich')							
+
 					layout_settings.addRow(wid_label, wid)
 
 				# handle list type

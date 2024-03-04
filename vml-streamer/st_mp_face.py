@@ -12,6 +12,7 @@ class MediaPipeFace:
 	def __init__(self):
 		self.label = 'MediaPipe - Face'
 		self.description = 'Sends face trackers from MediaPipe'
+		self.return_type = 'dict'
 		self.settings = [
 			{
 				'name': 'draw',
@@ -34,8 +35,8 @@ class MediaPipeFace:
 		# take control of when to send the data 
 		# through the socket connection
 
-		# socket info
-		self.addr_port = (stream['address'], stream['port'])
+		# ip address field should also accepts a comma delimited list, so we handle that
+		self.addr_ports = [(addr.strip(), stream['port']) for addr in stream['address'].split(',')]
 		
 		# should annotate image ?
 		self.annotate = settings['draw']
@@ -150,7 +151,8 @@ class MediaPipeFace:
 			self.joints[face_name+'_aspect'] = aspect
 		
 		# send data through socket
-		self.skt.sendto(json.dumps(self.joints).encode(), self.addr_port)
+		for addr_port in self.addr_ports:
+			self.skt.sendto(json.dumps(self.joints).encode(), addr_port)
 
 		# update video feedback with annotated image
 		if self.annotate:
@@ -161,3 +163,7 @@ class MediaPipeFace:
 	# helper function to remap value
 	def change_range(self, unscaled, from_min, from_max, to_min, to_max):
 		return (to_max-to_min)*(unscaled-from_min)/(from_max-from_min)+to_min
+
+	# terminate
+	def terminate(self):
+		self.video.imageDISPLAY = None
