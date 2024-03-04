@@ -196,7 +196,7 @@ Check *vml-streamer/_st_stream_template.py* for a complete documented example!
 - Because one-file is used, all depdendencies get extracted to a temp folder at runtime. You will NOT be able to use relative paths to, for example, load a binary file from "models". Instead, please "import resources" and get the absolute path by using "resources.getPath('./models/my-resource.ext')"
 
 ## Building
-To build the executable just activate your venv in a terminal, then run:
+To build the executable first **activate your venv** in a terminal, then run:
 
 	cd vml-streamer
 	pyinstaller main.spec
@@ -210,14 +210,14 @@ If you're having errors related to pywintypes, try disabling your anti-virus! Wi
 
 * Custom stream types and "python module not found" errors:
 
-Before building, make sure to run:
+	Before building, make sure to run:
 
-vml-streamer/rebuild_stream_types.bat (if on Windows)
+		vml-streamer/rebuild_stream_types.bat #(if on Windows)
 
-vml-streamer/rebuild_stream_types.sh  (if on Linux)
+		vml-streamer/rebuild_stream_types.sh  #(if on Linux)
 
-Because of the dynamic nature of how the stream types are read by the main app, 
-this will ensure pyinstaller includes all necessary .py files during the build.
+	Because of the dynamic nature of how the stream types are read by the main app, 
+	this will ensure pyinstaller includes all necessary .py files during the build.
 
 ---
 
