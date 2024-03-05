@@ -1,5 +1,4 @@
-import typing
-
+__all__: list[str] = []
 
 # Enumerations
 OCL_VECTOR_OWN: int

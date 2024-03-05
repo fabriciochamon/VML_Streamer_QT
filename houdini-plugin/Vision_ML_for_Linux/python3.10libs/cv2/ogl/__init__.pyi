@@ -1,3 +1,5 @@
+__all__: list[str] = []
+
 # Enumerations
 POINTS: int
 LINES: int

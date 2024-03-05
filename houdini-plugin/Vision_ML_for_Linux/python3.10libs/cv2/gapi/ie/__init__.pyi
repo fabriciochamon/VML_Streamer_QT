@@ -1,5 +1,10 @@
+__all__: list[str] = []
+
 import cv2.typing
-import typing
+import typing as _typing
+
+
+from cv2.gapi.ie import detail as detail
 
 
 # Enumerations
@@ -22,11 +27,11 @@ InferMode = int
 # Classes
 class PyParams:
     # Functions
-    @typing.overload
+    @_typing.overload
     def __init__(self) -> None: ...
-    @typing.overload
+    @_typing.overload
     def __init__(self, tag: str, model: str, weights: str, device: str) -> None: ...
-    @typing.overload
+    @_typing.overload
     def __init__(self, tag: str, model: str, device: str) -> None: ...
 
     def constInput(self, layer_name: str, data: cv2.typing.MatLike, hint: TraitAs = ...) -> PyParams: ...
@@ -38,9 +43,9 @@ class PyParams:
 
 
 # Functions
-@typing.overload
+@_typing.overload
 def params(tag: str, model: str, weights: str, device: str) -> PyParams: ...
-@typing.overload
+@_typing.overload
 def params(tag: str, model: str, device: str) -> PyParams: ...
 
 

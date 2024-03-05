@@ -1,6 +1,22 @@
+__all__: list[str] = []
+
 import cv2
 import cv2.typing
-import typing
+import typing as _typing
+
+
+from cv2.gapi import core as core
+from cv2.gapi import ie as ie
+from cv2.gapi import imgproc as imgproc
+from cv2.gapi import oak as oak
+from cv2.gapi import onnx as onnx
+from cv2.gapi import ot as ot
+from cv2.gapi import ov as ov
+from cv2.gapi import own as own
+from cv2.gapi import render as render
+from cv2.gapi import streaming as streaming
+from cv2.gapi import video as video
+from cv2.gapi import wip as wip
 
 
 # Enumerations
@@ -26,6 +42,7 @@ StereoOutputFormat = int
 CV_BOOL: int
 CV_INT: int
 CV_INT64: int
+CV_UINT64: int
 CV_DOUBLE: int
 CV_FLOAT: int
 CV_STRING: int
@@ -40,7 +57,7 @@ CV_GMAT: int
 CV_DRAW_PRIM: int
 CV_ANY: int
 ArgType = int
-"""One of [CV_BOOL, CV_INT, CV_INT64, CV_DOUBLE, CV_FLOAT, CV_STRING, CV_POINT, CV_POINT2F, CV_POINT3F, CV_SIZE, CV_RECT, CV_SCALAR, CV_MAT, CV_GMAT, CV_DRAW_PRIM, CV_ANY]"""
+"""One of [CV_BOOL, CV_INT, CV_INT64, CV_UINT64, CV_DOUBLE, CV_FLOAT, CV_STRING, CV_POINT, CV_POINT2F, CV_POINT3F, CV_SIZE, CV_RECT, CV_SCALAR, CV_MAT, CV_GMAT, CV_DRAW_PRIM, CV_ANY]"""
 
 
 
@@ -50,10 +67,10 @@ class GNetParam:
 
 class GNetPackage:
     # Functions
-    @typing.overload
+    @_typing.overload
     def __init__(self) -> None: ...
-    @typing.overload
-    def __init__(self, nets: typing.Sequence[GNetParam]) -> None: ...
+    @_typing.overload
+    def __init__(self, nets: _typing.Sequence[GNetParam]) -> None: ...
 
 
 
@@ -88,9 +105,9 @@ def NV12toGray(src_y: cv2.GMat, src_uv: cv2.GMat) -> cv2.GMat: ...
 
 def NV12toRGB(src_y: cv2.GMat, src_uv: cv2.GMat) -> cv2.GMat: ...
 
-@typing.overload
+@_typing.overload
 def RGB2Gray(src: cv2.GMat) -> cv2.GMat: ...
-@typing.overload
+@_typing.overload
 def RGB2Gray(src: cv2.GMat, rY: float, gY: float, bY: float) -> cv2.GMat: ...
 
 def RGB2HSV(src: cv2.GMat) -> cv2.GMat: ...
@@ -117,86 +134,86 @@ def absDiffC(src: cv2.GMat, c: cv2.GScalar) -> cv2.GMat: ...
 
 def add(src1: cv2.GMat, src2: cv2.GMat, ddepth: int = ...) -> cv2.GMat: ...
 
-@typing.overload
+@_typing.overload
 def addC(src1: cv2.GMat, c: cv2.GScalar, ddepth: int = ...) -> cv2.GMat: ...
-@typing.overload
+@_typing.overload
 def addC(c: cv2.GScalar, src1: cv2.GMat, ddepth: int = ...) -> cv2.GMat: ...
 
 def addWeighted(src1: cv2.GMat, alpha: float, src2: cv2.GMat, beta: float, gamma: float, ddepth: int = ...) -> cv2.GMat: ...
 
 def bilateralFilter(src: cv2.GMat, d: int, sigmaColor: float, sigmaSpace: float, borderType: int = ...) -> cv2.GMat: ...
 
-@typing.overload
+@_typing.overload
 def bitwise_and(src1: cv2.GMat, src2: cv2.GMat) -> cv2.GMat: ...
-@typing.overload
+@_typing.overload
 def bitwise_and(src1: cv2.GMat, src2: cv2.GScalar) -> cv2.GMat: ...
 
 def bitwise_not(src: cv2.GMat) -> cv2.GMat: ...
 
-@typing.overload
+@_typing.overload
 def bitwise_or(src1: cv2.GMat, src2: cv2.GMat) -> cv2.GMat: ...
-@typing.overload
+@_typing.overload
 def bitwise_or(src1: cv2.GMat, src2: cv2.GScalar) -> cv2.GMat: ...
 
-@typing.overload
+@_typing.overload
 def bitwise_xor(src1: cv2.GMat, src2: cv2.GMat) -> cv2.GMat: ...
-@typing.overload
+@_typing.overload
 def bitwise_xor(src1: cv2.GMat, src2: cv2.GScalar) -> cv2.GMat: ...
 
 def blur(src: cv2.GMat, ksize: cv2.typing.Size, anchor: cv2.typing.Point = ..., borderType: int = ..., borderValue: cv2.typing.Scalar = ...) -> cv2.GMat: ...
 
-@typing.overload
+@_typing.overload
 def boundingRect(src: cv2.GMat) -> cv2.GOpaqueT: ...
-@typing.overload
+@_typing.overload
 def boundingRect(src: cv2.GArrayT) -> cv2.GOpaqueT: ...
-@typing.overload
+@_typing.overload
 def boundingRect(src: cv2.GArrayT) -> cv2.GOpaqueT: ...
 
 def boxFilter(src: cv2.GMat, dtype: int, ksize: cv2.typing.Size, anchor: cv2.typing.Point = ..., normalize: bool = ..., borderType: int = ..., borderValue: cv2.typing.Scalar = ...) -> cv2.GMat: ...
 
 def cartToPolar(x: cv2.GMat, y: cv2.GMat, angleInDegrees: bool = ...) -> tuple[cv2.GMat, cv2.GMat]: ...
 
-@typing.overload
+@_typing.overload
 def cmpEQ(src1: cv2.GMat, src2: cv2.GMat) -> cv2.GMat: ...
-@typing.overload
+@_typing.overload
 def cmpEQ(src1: cv2.GMat, src2: cv2.GScalar) -> cv2.GMat: ...
 
-@typing.overload
+@_typing.overload
 def cmpGE(src1: cv2.GMat, src2: cv2.GMat) -> cv2.GMat: ...
-@typing.overload
+@_typing.overload
 def cmpGE(src1: cv2.GMat, src2: cv2.GScalar) -> cv2.GMat: ...
 
-@typing.overload
+@_typing.overload
 def cmpGT(src1: cv2.GMat, src2: cv2.GMat) -> cv2.GMat: ...
-@typing.overload
+@_typing.overload
 def cmpGT(src1: cv2.GMat, src2: cv2.GScalar) -> cv2.GMat: ...
 
-@typing.overload
+@_typing.overload
 def cmpLE(src1: cv2.GMat, src2: cv2.GMat) -> cv2.GMat: ...
-@typing.overload
+@_typing.overload
 def cmpLE(src1: cv2.GMat, src2: cv2.GScalar) -> cv2.GMat: ...
 
-@typing.overload
+@_typing.overload
 def cmpLT(src1: cv2.GMat, src2: cv2.GMat) -> cv2.GMat: ...
-@typing.overload
+@_typing.overload
 def cmpLT(src1: cv2.GMat, src2: cv2.GScalar) -> cv2.GMat: ...
 
-@typing.overload
+@_typing.overload
 def cmpNE(src1: cv2.GMat, src2: cv2.GMat) -> cv2.GMat: ...
-@typing.overload
+@_typing.overload
 def cmpNE(src1: cv2.GMat, src2: cv2.GScalar) -> cv2.GMat: ...
 
 def combine(lhs: cv2.GKernelPackage, rhs: cv2.GKernelPackage) -> cv2.GKernelPackage: ...
 
-@typing.overload
+@_typing.overload
 def concatHor(src1: cv2.GMat, src2: cv2.GMat) -> cv2.GMat: ...
-@typing.overload
-def concatHor(v: typing.Sequence[cv2.GMat]) -> cv2.GMat: ...
+@_typing.overload
+def concatHor(v: _typing.Sequence[cv2.GMat]) -> cv2.GMat: ...
 
-@typing.overload
+@_typing.overload
 def concatVert(src1: cv2.GMat, src2: cv2.GMat) -> cv2.GMat: ...
-@typing.overload
-def concatVert(v: typing.Sequence[cv2.GMat]) -> cv2.GMat: ...
+@_typing.overload
+def concatVert(v: _typing.Sequence[cv2.GMat]) -> cv2.GMat: ...
 
 def convertTo(src: cv2.GMat, rdepth: int, alpha: float = ..., beta: float = ...) -> cv2.GMat: ...
 
@@ -232,24 +249,24 @@ def goodFeaturesToTrack(image: cv2.GMat, maxCorners: int, qualityLevel: float, m
 
 def inRange(src: cv2.GMat, threshLow: cv2.GScalar, threshUp: cv2.GScalar) -> cv2.GMat: ...
 
-@typing.overload
+@_typing.overload
 def infer(name: str, inputs: cv2.GInferInputs) -> cv2.GInferOutputs: ...
-@typing.overload
+@_typing.overload
 def infer(name: str, roi: cv2.GOpaqueT, inputs: cv2.GInferInputs) -> cv2.GInferOutputs: ...
-@typing.overload
+@_typing.overload
 def infer(name: str, rois: cv2.GArrayT, inputs: cv2.GInferInputs) -> cv2.GInferListOutputs: ...
 
 def infer2(name: str, in_: cv2.GMat, inputs: cv2.GInferListInputs) -> cv2.GInferListOutputs: ...
 
 def integral(src: cv2.GMat, sdepth: int = ..., sqdepth: int = ...) -> tuple[cv2.GMat, cv2.GMat]: ...
 
-@typing.overload
+@_typing.overload
 def kmeans(data: cv2.GMat, K: int, bestLabels: cv2.GMat, criteria: cv2.typing.TermCriteria, attempts: int, flags: cv2.KmeansFlags) -> tuple[cv2.GOpaqueT, cv2.GMat, cv2.GMat]: ...
-@typing.overload
+@_typing.overload
 def kmeans(data: cv2.GMat, K: int, criteria: cv2.typing.TermCriteria, attempts: int, flags: cv2.KmeansFlags) -> tuple[cv2.GOpaqueT, cv2.GMat, cv2.GMat]: ...
-@typing.overload
+@_typing.overload
 def kmeans(data: cv2.GArrayT, K: int, bestLabels: cv2.GArrayT, criteria: cv2.typing.TermCriteria, attempts: int, flags: cv2.KmeansFlags) -> tuple[cv2.GOpaqueT, cv2.GArrayT, cv2.GArrayT]: ...
-@typing.overload
+@_typing.overload
 def kmeans(data: cv2.GArrayT, K: int, bestLabels: cv2.GArrayT, criteria: cv2.typing.TermCriteria, attempts: int, flags: cv2.KmeansFlags) -> tuple[cv2.GOpaqueT, cv2.GArrayT, cv2.GArrayT]: ...
 
 def mask(src: cv2.GMat, mask: cv2.GMat) -> cv2.GMat: ...
@@ -270,11 +287,11 @@ def morphologyEx(src: cv2.GMat, op: cv2.MorphTypes, kernel: cv2.typing.MatLike, 
 
 def mul(src1: cv2.GMat, src2: cv2.GMat, scale: float = ..., ddepth: int = ...) -> cv2.GMat: ...
 
-@typing.overload
+@_typing.overload
 def mulC(src: cv2.GMat, multiplier: float, ddepth: int = ...) -> cv2.GMat: ...
-@typing.overload
+@_typing.overload
 def mulC(src: cv2.GMat, multiplier: cv2.GScalar, ddepth: int = ...) -> cv2.GMat: ...
-@typing.overload
+@_typing.overload
 def mulC(multiplier: cv2.GScalar, src: cv2.GMat, ddepth: int = ...) -> cv2.GMat: ...
 
 def normInf(src: cv2.GMat) -> cv2.GScalar: ...
@@ -285,12 +302,12 @@ def normL2(src: cv2.GMat) -> cv2.GScalar: ...
 
 def normalize(src: cv2.GMat, alpha: float, beta: float, norm_type: int, ddepth: int = ...) -> cv2.GMat: ...
 
-@typing.overload
+@_typing.overload
 def parseSSD(in_: cv2.GMat, inSz: cv2.GOpaqueT, confidenceThreshold: float = ..., filterLabel: int = ...) -> tuple[cv2.GArrayT, cv2.GArrayT]: ...
-@typing.overload
+@_typing.overload
 def parseSSD(in_: cv2.GMat, inSz: cv2.GOpaqueT, confidenceThreshold: float, alignmentToSquare: bool, filterOutOfBounds: bool) -> cv2.GArrayT: ...
 
-def parseYolo(in_: cv2.GMat, inSz: cv2.GOpaqueT, confidenceThreshold: float = ..., nmsThreshold: float = ..., anchors: typing.Sequence[float] = ...) -> tuple[cv2.GArrayT, cv2.GArrayT]: ...
+def parseYolo(in_: cv2.GMat, inSz: cv2.GOpaqueT, confidenceThreshold: float = ..., nmsThreshold: float = ..., anchors: _typing.Sequence[float] = ...) -> tuple[cv2.GArrayT, cv2.GArrayT]: ...
 
 def phase(x: cv2.GMat, y: cv2.GMat, angleInDegrees: bool = ...) -> cv2.GMat: ...
 
@@ -318,9 +335,9 @@ def subRC(c: cv2.GScalar, src: cv2.GMat, ddepth: int = ...) -> cv2.GMat: ...
 
 def sum(src: cv2.GMat) -> cv2.GScalar: ...
 
-@typing.overload
+@_typing.overload
 def threshold(src: cv2.GMat, thresh: cv2.GScalar, maxval: cv2.GScalar, type: int) -> cv2.GMat: ...
-@typing.overload
+@_typing.overload
 def threshold(src: cv2.GMat, maxval: cv2.GScalar, type: int) -> tuple[cv2.GMat, cv2.GScalar]: ...
 
 def transpose(src: cv2.GMat) -> cv2.GMat: ...

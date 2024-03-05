@@ -1,5 +1,4 @@
-import typing
-
+__all__: list[str] = []
 
 # Functions
 def addSamplesDataSearchPath(path: str) -> None: ...

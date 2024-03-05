@@ -1,72 +1,74 @@
+__all__: list[str] = []
+
 import cv2.typing
-import typing
+import typing as _typing
 
 
 # Classes
 class PyParams:
     # Functions
-    @typing.overload
+    @_typing.overload
     def __init__(self) -> None: ...
-    @typing.overload
+    @_typing.overload
     def __init__(self, tag: str, model_path: str, bin_path: str, device: str) -> None: ...
-    @typing.overload
+    @_typing.overload
     def __init__(self, tag: str, blob_path: str, device: str) -> None: ...
 
     def cfgPluginConfig(self, config: cv2.typing.map_string_and_string) -> PyParams: ...
 
-    @typing.overload
+    @_typing.overload
     def cfgInputTensorLayout(self, tensor_layout: str) -> PyParams: ...
-    @typing.overload
+    @_typing.overload
     def cfgInputTensorLayout(self, layout_map: cv2.typing.map_string_and_string) -> PyParams: ...
 
-    @typing.overload
+    @_typing.overload
     def cfgInputModelLayout(self, tensor_layout: str) -> PyParams: ...
-    @typing.overload
+    @_typing.overload
     def cfgInputModelLayout(self, layout_map: cv2.typing.map_string_and_string) -> PyParams: ...
 
-    @typing.overload
+    @_typing.overload
     def cfgOutputTensorLayout(self, tensor_layout: str) -> PyParams: ...
-    @typing.overload
+    @_typing.overload
     def cfgOutputTensorLayout(self, layout_map: cv2.typing.map_string_and_string) -> PyParams: ...
 
-    @typing.overload
+    @_typing.overload
     def cfgOutputModelLayout(self, tensor_layout: str) -> PyParams: ...
-    @typing.overload
+    @_typing.overload
     def cfgOutputModelLayout(self, layout_map: cv2.typing.map_string_and_string) -> PyParams: ...
 
-    @typing.overload
+    @_typing.overload
     def cfgOutputTensorPrecision(self, precision: int) -> PyParams: ...
-    @typing.overload
+    @_typing.overload
     def cfgOutputTensorPrecision(self, precision_map: cv2.typing.map_string_and_int) -> PyParams: ...
 
-    @typing.overload
-    def cfgReshape(self, new_shape: typing.Sequence[int]) -> PyParams: ...
-    @typing.overload
+    @_typing.overload
+    def cfgReshape(self, new_shape: _typing.Sequence[int]) -> PyParams: ...
+    @_typing.overload
     def cfgReshape(self, new_shape_map: cv2.typing.map_string_and_vector_size_t) -> PyParams: ...
 
     def cfgNumRequests(self, nireq: int) -> PyParams: ...
 
-    @typing.overload
-    def cfgMean(self, mean_values: typing.Sequence[float]) -> PyParams: ...
-    @typing.overload
+    @_typing.overload
+    def cfgMean(self, mean_values: _typing.Sequence[float]) -> PyParams: ...
+    @_typing.overload
     def cfgMean(self, mean_map: cv2.typing.map_string_and_vector_float) -> PyParams: ...
 
-    @typing.overload
-    def cfgScale(self, scale_values: typing.Sequence[float]) -> PyParams: ...
-    @typing.overload
+    @_typing.overload
+    def cfgScale(self, scale_values: _typing.Sequence[float]) -> PyParams: ...
+    @_typing.overload
     def cfgScale(self, scale_map: cv2.typing.map_string_and_vector_float) -> PyParams: ...
 
-    @typing.overload
+    @_typing.overload
     def cfgResize(self, interpolation: int) -> PyParams: ...
-    @typing.overload
+    @_typing.overload
     def cfgResize(self, interpolation: cv2.typing.map_string_and_int) -> PyParams: ...
 
 
 
 # Functions
-@typing.overload
+@_typing.overload
 def params(tag: str, model_path: str, weights: str, device: str) -> PyParams: ...
-@typing.overload
+@_typing.overload
 def params(tag: str, bin_path: str, device: str) -> PyParams: ...
 
 

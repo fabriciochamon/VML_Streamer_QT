@@ -1,3 +1,5 @@
+__all__: list[str] = []
+
 # Enumerations
 AccelType_HOST: int
 ACCEL_TYPE_HOST: int

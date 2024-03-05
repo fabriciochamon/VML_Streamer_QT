@@ -1,6 +1,8 @@
+__all__: list[str] = []
+
 import cv2
 import cv2.typing
-import typing
+import typing as _typing
 
 
 # Enumerations
@@ -23,33 +25,33 @@ FlannIndexType = int
 # Classes
 class Index:
     # Functions
-    @typing.overload
+    @_typing.overload
     def __init__(self) -> None: ...
-    @typing.overload
+    @_typing.overload
     def __init__(self, features: cv2.typing.MatLike, params: cv2.typing.IndexParams, distType: int = ...) -> None: ...
-    @typing.overload
+    @_typing.overload
     def __init__(self, features: cv2.UMat, params: cv2.typing.IndexParams, distType: int = ...) -> None: ...
 
-    @typing.overload
+    @_typing.overload
     def build(self, features: cv2.typing.MatLike, params: cv2.typing.IndexParams, distType: int = ...) -> None: ...
-    @typing.overload
+    @_typing.overload
     def build(self, features: cv2.UMat, params: cv2.typing.IndexParams, distType: int = ...) -> None: ...
 
-    @typing.overload
+    @_typing.overload
     def knnSearch(self, query: cv2.typing.MatLike, knn: int, indices: cv2.typing.MatLike | None = ..., dists: cv2.typing.MatLike | None = ..., params: cv2.typing.SearchParams = ...) -> tuple[cv2.typing.MatLike, cv2.typing.MatLike]: ...
-    @typing.overload
+    @_typing.overload
     def knnSearch(self, query: cv2.UMat, knn: int, indices: cv2.UMat | None = ..., dists: cv2.UMat | None = ..., params: cv2.typing.SearchParams = ...) -> tuple[cv2.UMat, cv2.UMat]: ...
 
-    @typing.overload
+    @_typing.overload
     def radiusSearch(self, query: cv2.typing.MatLike, radius: float, maxResults: int, indices: cv2.typing.MatLike | None = ..., dists: cv2.typing.MatLike | None = ..., params: cv2.typing.SearchParams = ...) -> tuple[int, cv2.typing.MatLike, cv2.typing.MatLike]: ...
-    @typing.overload
+    @_typing.overload
     def radiusSearch(self, query: cv2.UMat, radius: float, maxResults: int, indices: cv2.UMat | None = ..., dists: cv2.UMat | None = ..., params: cv2.typing.SearchParams = ...) -> tuple[int, cv2.UMat, cv2.UMat]: ...
 
     def save(self, filename: str) -> None: ...
 
-    @typing.overload
+    @_typing.overload
     def load(self, features: cv2.typing.MatLike, filename: str) -> bool: ...
-    @typing.overload
+    @_typing.overload
     def load(self, features: cv2.UMat, filename: str) -> bool: ...
 
     def release(self) -> None: ...

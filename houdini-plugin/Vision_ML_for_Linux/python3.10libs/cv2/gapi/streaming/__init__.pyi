@@ -1,5 +1,7 @@
+__all__: list[str] = []
+
 import cv2
-import typing
+import typing as _typing
 
 
 # Enumerations
@@ -28,11 +30,11 @@ def seqNo(arg1: cv2.GMat) -> cv2.GOpaqueT: ...
 
 def seq_id(arg1: cv2.GMat) -> cv2.GOpaqueT: ...
 
-@typing.overload
+@_typing.overload
 def size(src: cv2.GMat) -> cv2.GOpaqueT: ...
-@typing.overload
+@_typing.overload
 def size(r: cv2.GOpaqueT) -> cv2.GOpaqueT: ...
-@typing.overload
+@_typing.overload
 def size(src: cv2.GFrame) -> cv2.GOpaqueT: ...
 
 def timestamp(arg1: cv2.GMat) -> cv2.GOpaqueT: ...

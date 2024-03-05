@@ -1,3 +1,5 @@
+__all__: list[str] = []
+
 EncoderConfig_RateControlMode_CBR: int
 ENCODER_CONFIG_RATE_CONTROL_MODE_CBR: int
 EncoderConfig_RateControlMode_VBR: int

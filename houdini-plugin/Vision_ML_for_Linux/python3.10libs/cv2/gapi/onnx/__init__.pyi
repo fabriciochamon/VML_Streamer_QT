@@ -1,5 +1,11 @@
+__all__: list[str] = []
+
+import cv2.gapi.onnx.ep
 import cv2.typing
-import typing
+import typing as _typing
+
+
+from cv2.gapi.onnx import ep as ep
 
 
 # Enumerations
@@ -15,14 +21,27 @@ TraitAs = int
 # Classes
 class PyParams:
     # Functions
-    @typing.overload
+    @_typing.overload
     def __init__(self) -> None: ...
-    @typing.overload
+    @_typing.overload
     def __init__(self, tag: str, model_path: str) -> None: ...
 
     def cfgMeanStd(self, layer_name: str, m: cv2.typing.Scalar, s: cv2.typing.Scalar) -> PyParams: ...
 
     def cfgNormalize(self, layer_name: str, flag: bool) -> PyParams: ...
+
+    @_typing.overload
+    def cfgAddExecutionProvider(self, ep: cv2.gapi.onnx.ep.OpenVINO) -> PyParams: ...
+    @_typing.overload
+    def cfgAddExecutionProvider(self, ep: cv2.gapi.onnx.ep.DirectML) -> PyParams: ...
+    @_typing.overload
+    def cfgAddExecutionProvider(self, ep: cv2.gapi.onnx.ep.CoreML) -> PyParams: ...
+    @_typing.overload
+    def cfgAddExecutionProvider(self, ep: cv2.gapi.onnx.ep.CUDA) -> PyParams: ...
+    @_typing.overload
+    def cfgAddExecutionProvider(self, ep: cv2.gapi.onnx.ep.TensorRT) -> PyParams: ...
+
+    def cfgDisableMemPattern(self) -> PyParams: ...
 
 
 

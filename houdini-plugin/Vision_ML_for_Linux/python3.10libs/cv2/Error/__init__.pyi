@@ -1,3 +1,5 @@
+__all__: list[str] = []
+
 # Enumerations
 StsOk: int
 STS_OK: int

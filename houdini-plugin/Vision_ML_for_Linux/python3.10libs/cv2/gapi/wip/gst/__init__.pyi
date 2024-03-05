@@ -1,5 +1,4 @@
-import typing
-
+__all__: list[str] = []
 
 GStreamerSource_OutputType_FRAME: int
 GSTREAMER_SOURCE_OUTPUT_TYPE_FRAME: int

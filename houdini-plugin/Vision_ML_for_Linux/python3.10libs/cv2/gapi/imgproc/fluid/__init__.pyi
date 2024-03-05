@@ -1,5 +1,6 @@
+__all__: list[str] = []
+
 import cv2
-import typing
 
 
 # Functions

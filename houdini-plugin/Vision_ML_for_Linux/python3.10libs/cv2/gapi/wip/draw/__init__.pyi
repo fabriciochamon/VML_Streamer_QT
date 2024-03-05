@@ -1,6 +1,8 @@
+__all__: list[str] = []
+
 import cv2
 import cv2.typing
-import typing
+import typing as _typing
 
 
 # Classes
@@ -15,9 +17,9 @@ class Text:
     bottom_left_origin: bool
 
     # Functions
-    @typing.overload
+    @_typing.overload
     def __init__(self, text_: str, org_: cv2.typing.Point, ff_: int, fs_: float, color_: cv2.typing.Scalar, thick_: int = ..., lt_: int = ..., bottom_left_origin_: bool = ...) -> None: ...
-    @typing.overload
+    @_typing.overload
     def __init__(self) -> None: ...
 
 
@@ -29,9 +31,9 @@ class Rect:
     shift: int
 
     # Functions
-    @typing.overload
+    @_typing.overload
     def __init__(self) -> None: ...
-    @typing.overload
+    @_typing.overload
     def __init__(self, rect_: cv2.typing.Rect2i, color_: cv2.typing.Scalar, thick_: int = ..., lt_: int = ..., shift_: int = ...) -> None: ...
 
 
@@ -44,9 +46,9 @@ class Circle:
     shift: int
 
     # Functions
-    @typing.overload
+    @_typing.overload
     def __init__(self, center_: cv2.typing.Point, radius_: int, color_: cv2.typing.Scalar, thick_: int = ..., lt_: int = ..., shift_: int = ...) -> None: ...
-    @typing.overload
+    @_typing.overload
     def __init__(self) -> None: ...
 
 
@@ -59,9 +61,9 @@ class Line:
     shift: int
 
     # Functions
-    @typing.overload
+    @_typing.overload
     def __init__(self, pt1_: cv2.typing.Point, pt2_: cv2.typing.Point, color_: cv2.typing.Scalar, thick_: int = ..., lt_: int = ..., shift_: int = ...) -> None: ...
-    @typing.overload
+    @_typing.overload
     def __init__(self) -> None: ...
 
 
@@ -71,9 +73,9 @@ class Mosaic:
     decim: int
 
     # Functions
-    @typing.overload
+    @_typing.overload
     def __init__(self) -> None: ...
-    @typing.overload
+    @_typing.overload
     def __init__(self, mos_: cv2.typing.Rect2i, cellSz_: int, decim_: int) -> None: ...
 
 
@@ -83,32 +85,32 @@ class Image:
     alpha: cv2.typing.MatLike
 
     # Functions
-    @typing.overload
+    @_typing.overload
     def __init__(self, org_: cv2.typing.Point, img_: cv2.typing.MatLike, alpha_: cv2.typing.MatLike) -> None: ...
-    @typing.overload
+    @_typing.overload
     def __init__(self) -> None: ...
 
 
 class Poly:
-    points: typing.Sequence[cv2.typing.Point]
+    points: _typing.Sequence[cv2.typing.Point]
     color: cv2.typing.Scalar
     thick: int
     lt: int
     shift: int
 
     # Functions
-    @typing.overload
-    def __init__(self, points_: typing.Sequence[cv2.typing.Point], color_: cv2.typing.Scalar, thick_: int = ..., lt_: int = ..., shift_: int = ...) -> None: ...
-    @typing.overload
+    @_typing.overload
+    def __init__(self, points_: _typing.Sequence[cv2.typing.Point], color_: cv2.typing.Scalar, thick_: int = ..., lt_: int = ..., shift_: int = ...) -> None: ...
+    @_typing.overload
     def __init__(self) -> None: ...
 
 
 
 # Functions
-@typing.overload
-def render(bgr: cv2.typing.MatLike, prims: typing.Sequence[cv2.typing.Prim], args: typing.Sequence[cv2.GCompileArg] = ...) -> None: ...
-@typing.overload
-def render(y_plane: cv2.typing.MatLike, uv_plane: cv2.typing.MatLike, prims: typing.Sequence[cv2.typing.Prim], args: typing.Sequence[cv2.GCompileArg] = ...) -> None: ...
+@_typing.overload
+def render(bgr: cv2.typing.MatLike, prims: _typing.Sequence[cv2.typing.Prim], args: _typing.Sequence[cv2.GCompileArg] = ...) -> None: ...
+@_typing.overload
+def render(y_plane: cv2.typing.MatLike, uv_plane: cv2.typing.MatLike, prims: _typing.Sequence[cv2.typing.Prim], args: _typing.Sequence[cv2.GCompileArg] = ...) -> None: ...
 
 def render3ch(src: cv2.GMat, prims: cv2.GArrayT) -> cv2.GMat: ...
 
