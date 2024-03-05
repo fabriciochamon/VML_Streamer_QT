@@ -58,9 +58,9 @@ __all__ = [
 
 import cv2.mat_wrapper
 import numpy
-import cv2.dnn
 import cv2
 import typing as _typing
+import cv2.dnn
 import cv2.gapi.wip.draw
 
 
