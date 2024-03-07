@@ -365,7 +365,7 @@ class MainWindow(QtWidgets.QWidget):
 					for ctrl in ctrls:
 						c_name = ctrl['name']
 						c_min  = ctrl['min']
-						c_max  = ctrl['min']
+						c_max  = ctrl['max']
 						c_val  = ctrl['value']
 
 						if c_name == 'auto_exposure':  

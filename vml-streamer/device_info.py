@@ -225,4 +225,5 @@ def get_v4l2_ctrls(device_path):
 					'value': value,
 				}
 				controls.append(ctrl)
+
 	return controls
