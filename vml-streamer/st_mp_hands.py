@@ -64,7 +64,7 @@ class MediaPipeHands:
 		self.frame_height = video.resolution[1]
 		
 		# input image to MP format (track flipped image as it feels better in the 3d viewport)
-		image = cv2.flip(video.imageBGR, 1) 
+		image = video.imageBGR #cv2.flip(video.imageBGR, 1) 
 		image = cv2.imencode('.jpg', image, params=[cv2.IMWRITE_JPEG_QUALITY, 85])[1]
 		image = cv2.imdecode(image, cv2.IMREAD_COLOR)
 		image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -137,7 +137,7 @@ class MediaPipeHands:
 		image_annotated = None
 		if self.annotate:
 			image_annotated = self.video.imageBGR.copy()
-			image_annotated = cv2.flip(image_annotated, 1)
+			#image_annotated = cv2.flip(image_annotated, 1)
 		else:
 			self.video.imageDISPLAY = None
 
