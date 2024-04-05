@@ -51,7 +51,7 @@ class ExampleStream:
 			REQUIRED keys: 
 				"name"  (unique, should not contain spaces!)
 				"label" (UI display name, can contain spaces and special chars)
-				"type"  (bool | float | str | list)
+				"type"  (bool | float | int | str | list)
 			
 			OPTIONAL keys:
 				"default_value" (field initial value)
